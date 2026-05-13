@@ -206,7 +206,8 @@
   .card-link { display: block; color: inherit; text-decoration: none; }
   .card-link:focus { outline: none; }
   .card-link:focus .card { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(16,185,129,0.18); }
-  .card-link-indicator { position: absolute; top: 10px; right: 10px; font-size: 11px; color: var(--text-mute); opacity: 0.65; transition: opacity 0.15s; }
+  .card-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .card-link-indicator { font-size: 10px; color: var(--text-mute); opacity: 0.7; transition: opacity 0.15s; font-weight: 500; line-height: 1.2; white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
   .card:hover .card-link-indicator { opacity: 1; color: var(--accent-2); }
 
   .chip .count { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 999px; background: var(--card-hover); color: var(--accent-2); font-size: 9.5px; font-weight: 700; }
@@ -882,7 +883,6 @@ function renderCards() {
     return `
     ${linkOpen}
     <div class="card ${p.id === 'hemenmagaza' ? 'featured' : ''}">
-      ${url ? `<div class="card-link-indicator">${url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')} ↗</div>` : ''}
       <div class="card-head">
         <div class="card-title">
           <div class="card-logo ${p.logoCls}">${p.logoTxt}</div>
@@ -895,7 +895,10 @@ function renderCards() {
             </div>
           </div>
         </div>
-        ${p.badge ? `<span class="badge ${p.badge.cls}">${p.badge.txt}</span>` : ''}
+        <div class="card-head-right">
+          ${p.badge ? `<span class="badge ${p.badge.cls}">${p.badge.txt}</span>` : ''}
+          ${url ? `<div class="card-link-indicator">${url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')} ↗</div>` : ''}
+        </div>
       </div>
 
       <div class="total-score">
