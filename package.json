@@ -1,0 +1,14 @@
+{
+  "name": "eticaret-platformlari",
+  "version": "2.0.0",
+  "description": "Türkiye ve dünya e-ticaret platformlarının güncel karşılaştırması — Hemenmağaza vs ikas, Ticimax, ideaSoft, T-Soft, Shopify ve daha fazlası.",
+  "type": "module",
+  "scripts": {
+    "daily": "node scripts/daily-update.js",
+    "refresh": "node scripts/ai-refresh.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0"
+  },
+  "license": "MIT"
+}
