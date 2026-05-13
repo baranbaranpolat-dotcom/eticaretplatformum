@@ -203,6 +203,44 @@
   footer a:hover { text-decoration: underline; }
   .hidden { display: none !important; }
 
+  .card-link { display: block; color: inherit; text-decoration: none; }
+  .card-link:focus { outline: none; }
+  .card-link:focus .card { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(16,185,129,0.18); }
+  .card-link-indicator { position: absolute; top: 10px; right: 10px; font-size: 11px; color: var(--text-mute); opacity: 0.65; transition: opacity 0.15s; }
+  .card:hover .card-link-indicator { opacity: 1; color: var(--accent-2); }
+
+  .chip .count { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 999px; background: var(--card-hover); color: var(--accent-2); font-size: 9.5px; font-weight: 700; }
+  .chip.active .count { background: rgba(255,255,255,0.25); color: white; }
+
+  .compare-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
+  .compare-selectors { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .compare-select { flex: 1; min-width: 220px; max-width: 280px; padding: 9px 12px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; }
+  .compare-select:focus { border-color: var(--accent); }
+  .compare-vs { font-size: 18px; color: var(--accent); font-weight: 800; }
+  .compare-swap { background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--accent-2); }
+  .compare-swap:hover { background: var(--card-hover); border-color: var(--accent); transform: rotate(180deg); transition: transform 0.3s; }
+
+  .compare-result { border-top: 1px solid var(--border); padding-top: 16px; }
+  .compare-header { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .compare-side { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .compare-side.winner { border-color: var(--good); background: linear-gradient(135deg, rgba(34,197,94,0.06), var(--bg)); }
+  .compare-side-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .compare-side h4 { font-size: 15px; font-weight: 700; }
+  .compare-side .total { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+  .compare-side .total-lbl { font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.04em; }
+  .compare-side .meta-line { font-size: 11px; color: var(--text-mute); margin-top: 4px; }
+
+  .compare-row { display: grid; grid-template-columns: 1fr 100px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-size: 12px; }
+  .compare-row .key { text-align: center; color: var(--text-mute); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+  .compare-row .val { background: var(--bg); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); text-align: center; }
+  .compare-row .val.win { background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.03)); color: var(--good); font-weight: 700; border-color: rgba(34,197,94,0.3); }
+
+  .compare-prosCons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .compare-prosCons-col { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+  .compare-prosCons-col h5 { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+  .compare-verdict { margin-top: 14px; padding: 12px; background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.03)); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; font-size: 13px; color: var(--accent-2); }
+  .compare-verdict strong { color: var(--text); }
+
   @media (max-width: 640px) {
     .hero { padding: 28px 0 14px; }
     section { margin-bottom: 22px; }
@@ -210,6 +248,10 @@
     .quiz-card { padding: 16px; }
     .features-grid { grid-template-columns: repeat(4, 1fr); }
     .score-grid { grid-template-columns: repeat(3, 1fr); }
+    .compare-header { grid-template-columns: 1fr; }
+    .compare-row { grid-template-columns: 1fr; gap: 4px; padding: 6px 0; }
+    .compare-row .key { padding: 4px 0; }
+    .compare-prosCons { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -247,6 +289,7 @@
     <button class="tab active" data-tab="cards">📋 Platform Kartları</button>
     <button class="tab" data-tab="table">📊 Karşılaştırma Tablosu</button>
     <button class="tab" data-tab="vs">⚔️ Hemenmağaza vs</button>
+    <button class="tab" data-tab="compare">🆚 İki Marka Kıyasla</button>
     <button class="tab" data-tab="quiz">🎯 Bana Uygun Olan?</button>
   </div>
 
@@ -255,15 +298,16 @@
       <input type="text" id="searchInput" placeholder="Platform ara (ör: Shopify, ikas, WooCommerce)..." autocomplete="off">
     </div>
     <div class="chip-group" id="regionChips">
-      <div class="chip active" data-filter="region" data-val="all">Tümü</div>
-      <div class="chip" data-filter="region" data-val="TR">🇹🇷 Türkiye</div>
-      <div class="chip" data-filter="region" data-val="Global">🌍 Dünya</div>
+      <div class="chip active" data-filter="region" data-val="all">Tümü <span class="count" data-count="region-all"></span></div>
+      <div class="chip" data-filter="region" data-val="TR">🇹🇷 Türkiye <span class="count" data-count="region-TR"></span></div>
+      <div class="chip" data-filter="region" data-val="Global">🌍 Dünya <span class="count" data-count="region-Global"></span></div>
     </div>
     <div class="chip-group" id="modelChips">
-      <div class="chip active" data-filter="model" data-val="all">Hepsi</div>
-      <div class="chip" data-filter="model" data-val="SaaS">SaaS</div>
-      <div class="chip" data-filter="model" data-val="OSS">Açık Kaynak</div>
-      <div class="chip" data-filter="model" data-val="Enterprise">Kurumsal</div>
+      <div class="chip active" data-filter="model" data-val="brands">🏷️ Markalar <span class="count" data-count="brands"></span></div>
+      <div class="chip" data-filter="model" data-val="all">Tümü <span class="count" data-count="all"></span></div>
+      <div class="chip" data-filter="model" data-val="SaaS">SaaS <span class="count" data-count="SaaS"></span></div>
+      <div class="chip" data-filter="model" data-val="OSS">Açık Kaynak <span class="count" data-count="OSS"></span></div>
+      <div class="chip" data-filter="model" data-val="Enterprise">Kurumsal <span class="count" data-count="Enterprise"></span></div>
     </div>
     <select id="sortSelect" class="btn">
       <option value="score">Skor (yüksek → düşük)</option>
@@ -311,6 +355,23 @@
       </div>
     </div>
     <div class="vs-grid" id="vsGrid"></div>
+  </section>
+
+  <section id="compare" class="tab-content hidden">
+    <div class="section-head">
+      <div>
+        <h2>İki Markayı Yan Yana Kıyasla</h2>
+        <p>Aşağıdan iki platform seç — tüm kriterlerde detaylı yan yana karşılaştırma görüntülenir.</p>
+      </div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-selectors">
+        <select id="compareA" class="compare-select"></select>
+        <div class="compare-swap" id="compareSwap" title="A ve B'yi yer değiştir">⇄</div>
+        <select id="compareB" class="compare-select"></select>
+      </div>
+      <div id="compareResult" class="compare-result"></div>
+    </div>
   </section>
 
   <section id="quiz" class="tab-content hidden">
@@ -733,12 +794,42 @@ PLATFORMS.forEach(p => {
   p.total = +((s.fiyat + s.ozellik + s.kolaylik + s.destek + s.ekosistem) / 5).toFixed(1);
 });
 
-const STATE = { region: 'all', model: 'all', search: '', sort: 'score' };
+const URL_MAP = {
+  hemenmagaza: 'https://hemenmagaza.com',
+  ikas: 'https://www.ikas.com/tr',
+  ticimax: 'https://www.ticimax.com',
+  ideasoft: 'https://www.ideasoft.com.tr',
+  tsoft: 'https://www.tsoft.com.tr',
+  shopiverse: 'https://www.shopiverse.com',
+  platinmarket: 'https://www.platinmarket.com',
+  faprika: 'https://www.faprika.com',
+  etrend: 'https://www.etrend.com.tr',
+  sentrop: 'https://www.sentrop.com',
+  eticaretgold: 'https://www.eticaretgold.com',
+  shopify: 'https://www.shopify.com',
+  bigcommerce: 'https://www.bigcommerce.com',
+  wix: 'https://www.wix.com/ecommerce',
+  squarespace: 'https://www.squarespace.com',
+  webflow: 'https://webflow.com/ecommerce',
+  ecwid: 'https://www.ecwid.com',
+  squareonline: 'https://squareup.com/online-store',
+  bigcartel: 'https://www.bigcartel.com',
+  shoplazza: 'https://www.shoplazza.com',
+  woocommerce: 'https://woocommerce.com',
+  magento: 'https://business.adobe.com/products/magento/magento-commerce.html',
+  prestashop: 'https://www.prestashop.com',
+  opencart: 'https://www.opencart.com',
+  salesforce: 'https://www.salesforce.com/commerce/',
+  commercetools: 'https://commercetools.com'
+};
+
+const STATE = { region: 'all', model: 'brands', search: '', sort: 'score' };
 
 function filterPlatforms() {
   let list = [...PLATFORMS];
   if (STATE.region !== 'all') list = list.filter(p => p.region === STATE.region);
-  if (STATE.model !== 'all') list = list.filter(p => p.model === STATE.model);
+  if (STATE.model === 'brands') list = list.filter(p => p.model !== 'OSS');
+  else if (STATE.model !== 'all') list = list.filter(p => p.model === STATE.model);
   if (STATE.search) {
     const q = STATE.search.toLowerCase();
     list = list.filter(p => p.name.toLowerCase().includes(q) || p.sub.toLowerCase().includes(q) || p.bestFor.toLowerCase().includes(q));
@@ -785,8 +876,13 @@ function renderCards() {
 
   grid.innerHTML = list.map(p => {
     const f = p.features || {};
+    const url = URL_MAP[p.id];
+    const linkOpen = url ? `<a href="${url}" target="_blank" rel="noopener" class="card-link" title="${p.name} sitesini aç">` : '<div class="card-link">';
+    const linkClose = url ? `</a>` : `</div>`;
     return `
+    ${linkOpen}
     <div class="card ${p.id === 'hemenmagaza' ? 'featured' : ''}">
+      ${url ? `<div class="card-link-indicator">${url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')} ↗</div>` : ''}
       <div class="card-head">
         <div class="card-title">
           <div class="card-logo ${p.logoCls}">${p.logoTxt}</div>
@@ -850,6 +946,7 @@ function renderCards() {
         <div>${p.bestFor}</div>
       </div>
     </div>
+    ${linkClose}
   `;}).join('');
 }
 
@@ -957,6 +1054,155 @@ function pickPriceLower(a, b) {
   if (aSpec && !bSpec) return 'b';
   if (!aSpec && bSpec) return 'a';
   return 'tie';
+}
+
+function updateCounts() {
+  const all = PLATFORMS.length;
+  const tr = PLATFORMS.filter(p => p.region === 'TR').length;
+  const global = PLATFORMS.filter(p => p.region === 'Global').length;
+  const brands = PLATFORMS.filter(p => p.model !== 'OSS').length;
+  const saas = PLATFORMS.filter(p => p.model === 'SaaS').length;
+  const oss = PLATFORMS.filter(p => p.model === 'OSS').length;
+  const ent = PLATFORMS.filter(p => p.model === 'Enterprise').length;
+  const set = (key, n) => {
+    const el = document.querySelector(`[data-count="${key}"]`);
+    if (el) el.textContent = n;
+  };
+  set('region-all', all);
+  set('region-TR', tr);
+  set('region-Global', global);
+  set('brands', brands);
+  set('all', all);
+  set('SaaS', saas);
+  set('OSS', oss);
+  set('Enterprise', ent);
+}
+
+// ===== 2-Brand Comparison =====
+function populateCompareSelects() {
+  const selA = document.getElementById('compareA');
+  const selB = document.getElementById('compareB');
+  const options = PLATFORMS.map(p => `<option value="${p.id}">${p.country} ${p.name} (${p.total}/10)</option>`).join('');
+  selA.innerHTML = options;
+  selB.innerHTML = options;
+  selA.value = 'hemenmagaza';
+  selB.value = 'ikas';
+  renderCompareResult();
+}
+
+function renderCompareResult() {
+  const a = PLATFORMS.find(p => p.id === document.getElementById('compareA').value);
+  const b = PLATFORMS.find(p => p.id === document.getElementById('compareB').value);
+  if (!a || !b) return;
+
+  const out = document.getElementById('compareResult');
+  if (a.id === b.id) {
+    out.innerHTML = '<div style="text-align:center; color:var(--text-mute); padding:24px">Aynı platformu seçtin — farklı 2 platform seçerek kıyasla.</div>';
+    return;
+  }
+
+  const fA = a.features || {}, fB = b.features || {};
+  const totalWinner = a.total > b.total ? 'a' : (a.total < b.total ? 'b' : 'tie');
+
+  const fields = [
+    { key: 'Başlangıç fiyatı', a: a.pricing.starter, b: b.pricing.starter, winner: pickPriceLower(a.pricing.starter, b.pricing.starter) },
+    { key: 'Büyüme paketi', a: a.pricing.growth, b: b.pricing.growth, winner: 'tie' },
+    { key: 'Üst paket', a: a.pricing.enterprise, b: b.pricing.enterprise, winner: 'tie' },
+    { key: 'Ücretsiz deneme', a: a.trial, b: b.trial, winner: a.trial.includes('30') ? 'a' : (b.trial.includes('30') ? 'b' : 'tie') },
+    { key: 'Kuruluş yılı', a: a.foundedYear, b: b.foundedYear, winner: cmp(a.foundedYear, b.foundedYear) },
+    { key: 'Müşteri tabanı', a: a.customers, b: b.customers, winner: 'tie' },
+    { key: 'Bölge', a: a.region === 'TR' ? '🇹🇷 Türkiye' : `${a.country} Global`, b: b.region === 'TR' ? '🇹🇷 Türkiye' : `${b.country} Global`, winner: 'tie' },
+    { key: 'Model', a: a.model, b: b.model, winner: 'tie' }
+  ];
+
+  const featRows = [
+    { key: '🎨 Tema sayısı', a: featFmt(fA.themes), b: featFmt(fB.themes), winner: cmp(fA.themes || 0, fB.themes || 0) },
+    { key: '📱 Mobil app', a: boolFmt(fA.mobile), b: boolFmt(fB.mobile), winner: cmp(fA.mobile || 0, fB.mobile || 0) },
+    { key: '🤖 AI özellikler', a: boolFmt(fA.ai), b: boolFmt(fB.ai), winner: cmp(fA.ai || 0, fB.ai || 0) },
+    { key: '🏪 B2B', a: boolFmt(fA.b2b), b: boolFmt(fB.b2b), winner: cmp(fA.b2b || 0, fB.b2b || 0) },
+    { key: '🌐 Çok dil', a: boolFmt(fA.multilang), b: boolFmt(fB.multilang), winner: cmp(fA.multilang || 0, fB.multilang || 0) },
+    { key: '🛒 POS', a: boolFmt(fA.pos), b: boolFmt(fB.pos), winner: cmp(fA.pos || 0, fB.pos || 0) },
+    { key: '💳 Ödeme yöntemi', a: featFmt(fA.payments), b: featFmt(fB.payments), winner: cmp(fA.payments || 0, fB.payments || 0) },
+    { key: '🔗 Pazaryeri', a: featFmt(fA.marketplaces), b: featFmt(fB.marketplaces), winner: cmp(fA.marketplaces || 0, fB.marketplaces || 0) }
+  ];
+
+  const scoreRows = [
+    { key: 'Fiyat skoru', a: `${a.scores.fiyat}/10`, b: `${b.scores.fiyat}/10`, winner: cmp(a.scores.fiyat, b.scores.fiyat) },
+    { key: 'Özellik skoru', a: `${a.scores.ozellik}/10`, b: `${b.scores.ozellik}/10`, winner: cmp(a.scores.ozellik, b.scores.ozellik) },
+    { key: 'Kolaylık', a: `${a.scores.kolaylik}/10`, b: `${b.scores.kolaylik}/10`, winner: cmp(a.scores.kolaylik, b.scores.kolaylik) },
+    { key: 'Destek', a: `${a.scores.destek}/10`, b: `${b.scores.destek}/10`, winner: cmp(a.scores.destek, b.scores.destek) },
+    { key: 'Ekosistem', a: `${a.scores.ekosistem}/10`, b: `${b.scores.ekosistem}/10`, winner: cmp(a.scores.ekosistem, b.scores.ekosistem) }
+  ];
+
+  const renderRow = r => `
+    <div class="compare-row">
+      <div class="val ${r.winner === 'a' ? 'win' : ''}">${r.a}</div>
+      <div class="key">${r.key}</div>
+      <div class="val ${r.winner === 'b' ? 'win' : ''}">${r.b}</div>
+    </div>`;
+
+  const renderSide = (p, isWinner) => `
+    <div class="compare-side ${isWinner ? 'winner' : ''}">
+      <div class="compare-side-head">
+        <div class="card-logo ${p.logoCls}" style="width:36px;height:36px;font-size:15px">${p.logoTxt}</div>
+        <div style="flex:1; min-width:0">
+          <h4>${p.name}</h4>
+          <div class="meta-line">${p.sub}</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div class="total">${p.total}/10</div>
+        <div class="total-lbl">Toplam skor</div>
+      </div>
+      <div class="meta-line" style="text-align:center; margin-top:8px">${p.country} · ${p.model} · ${p.customers} müşteri</div>
+      ${URL_MAP[p.id] ? `<div style="text-align:center; margin-top:8px"><a href="${URL_MAP[p.id]}" target="_blank" rel="noopener" style="font-size:11px; color:var(--accent-2); text-decoration:none; font-weight:600">${URL_MAP[p.id].replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')} ↗</a></div>` : ''}
+    </div>`;
+
+  let verdictText = '';
+  if (totalWinner === 'a') verdictText = `<strong>${a.name}</strong> toplam skorda öne çıkıyor (${a.total} vs ${b.total}).`;
+  else if (totalWinner === 'b') verdictText = `<strong>${b.name}</strong> toplam skorda öne çıkıyor (${b.total} vs ${a.total}).`;
+  else verdictText = `İki platform da eşit toplam skorda (${a.total}/10). Önceliklerine göre karar ver.`;
+  verdictText += ` ${a.region === b.region ? '' : a.region === 'TR' ? `${a.name} Türkiye odaklı, ${b.name} global. ` : `${b.name} Türkiye odaklı, ${a.name} global. `}`;
+  verdictText += `Bütçen sıkıysa <strong>${a.scores.fiyat > b.scores.fiyat ? a.name : b.name}</strong>, özellik istiyorsan <strong>${a.scores.ozellik > b.scores.ozellik ? a.name : b.name}</strong> tercih edilebilir.`;
+
+  out.innerHTML = `
+    <div class="compare-header">
+      ${renderSide(a, totalWinner === 'a')}
+      ${renderSide(b, totalWinner === 'b')}
+    </div>
+
+    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">Fiyat & Genel Bilgiler</h4>
+    ${fields.map(renderRow).join('')}
+
+    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">Özellikler</h4>
+    ${featRows.map(renderRow).join('')}
+
+    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">Skorlar</h4>
+    ${scoreRows.map(renderRow).join('')}
+
+    <div class="compare-prosCons">
+      <div class="compare-prosCons-col">
+        <h5 style="color:var(--good)">+ ${a.name} artıları</h5>
+        <ul class="feat-list pros">${a.pros.slice(0, 6).map(x => `<li>${x}</li>`).join('')}</ul>
+      </div>
+      <div class="compare-prosCons-col">
+        <h5 style="color:var(--good)">+ ${b.name} artıları</h5>
+        <ul class="feat-list pros">${b.pros.slice(0, 6).map(x => `<li>${x}</li>`).join('')}</ul>
+      </div>
+      <div class="compare-prosCons-col">
+        <h5 style="color:var(--bad)">− ${a.name} eksileri</h5>
+        <ul class="feat-list cons">${a.cons.slice(0, 5).map(x => `<li>${x}</li>`).join('')}</ul>
+      </div>
+      <div class="compare-prosCons-col">
+        <h5 style="color:var(--bad)">− ${b.name} eksileri</h5>
+        <ul class="feat-list cons">${b.cons.slice(0, 5).map(x => `<li>${x}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    <div class="compare-verdict">
+      <strong>🎯 Karar:</strong> ${verdictText}
+    </div>
+  `;
 }
 
 const QUIZ = { budget: null, market: null, experience: null, tech: null, priority: null };
@@ -1084,6 +1330,19 @@ document.getElementById('sortSelect').addEventListener('change', e => {
 
 document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
 
+document.getElementById('compareA').addEventListener('change', renderCompareResult);
+document.getElementById('compareB').addEventListener('change', renderCompareResult);
+document.getElementById('compareSwap').addEventListener('click', () => {
+  const selA = document.getElementById('compareA');
+  const selB = document.getElementById('compareB');
+  const tmp = selA.value;
+  selA.value = selB.value;
+  selB.value = tmp;
+  renderCompareResult();
+});
+
+updateCounts();
+populateCompareSelects();
 renderCards();
 renderTable();
 renderVs();
