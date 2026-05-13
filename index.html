@@ -164,6 +164,17 @@
   .total-score { text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(52,211,153,0.05)); border: 1px solid rgba(16,185,129,0.25); margin: 8px 0; }
   .total-score .big { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1; }
   .total-score .lbl { font-size: 10px; color: var(--text-mute); margin-top: 1px; }
+  .transparency-line { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); font-size: 10px; color: var(--text-mute); display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .transparency-line .lbl { font-weight: 600; }
+  .transparency-bar { display: inline-block; width: 60px; height: 5px; background: var(--border); border-radius: 999px; overflow: hidden; }
+  .transparency-bar > div { height: 100%; border-radius: 999px; transition: width 0.3s; }
+  .transparency-num { font-weight: 700; }
+  .t-high { color: var(--good); }
+  .t-mid { color: var(--warn); }
+  .t-low { color: var(--bad); }
+  .transparency-bar > div.t-high-bg { background: var(--good); }
+  .transparency-bar > div.t-mid-bg { background: var(--warn); }
+  .transparency-bar > div.t-low-bg { background: var(--bad); }
 
   .best-for { margin-top: auto; padding: 8px 10px; background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02)); border-radius: 7px; border-left: 3px solid var(--accent); }
   .best-for strong { font-size: 9.5px; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
@@ -497,15 +508,15 @@ const PLATFORMS = [
   {
     id: 'hemenmagaza', name: 'Hemenmağaza', logoCls: 'lg-hemen', logoTxt: 'H',
     sub: 'Yeni nesil sade panel', badge: { txt: 'YENİ', cls: 'badge-new' },
-    region: 'TR', model: 'SaaS', country: '🇹🇷', popularity: 1, foundedYear: 2024,
-    foundedNote: 'Yeni', customers: '200+ mağaza',
+    region: 'TR', model: 'SaaS', country: '🇹🇷', popularity: 1, foundedYear: null,
+    foundedNote: 'Belirsiz', customers: 'Belirsiz (sayfa dinamik sayaç)',
     pricing: { starter: '1.490₺/ay', growth: '2.990₺/ay', enterprise: '5.990₺/ay' },
-    trial: '30 gün',
-    features: { themes: null, mobile: null, ai: 0, b2b: null, multilang: 1, pos: 1, payments: 3, marketplaces: null },
-    pros: ['Şeffaf 3 paket fiyatı (1.490₺ / 2.990₺ / 5.990₺)', '30 gün ücretsiz deneme — sektör ortalamasının üstü', 'TR/EN/DE çoklu dil ve TL/USD/EUR para birimi desteği', 'Web + POS hibrit sipariş yönetimi destekleniyor', 'iyzico, PayTR ödeme entegrasyonu', 'Yurtiçi ve Aras Kargo entegrasyonu', '7/24 destek altyapısı', 'Kendi domainde panel'],
-    cons: ['Yeni platform — uzun vadeli referans azlığı', 'Resmi sitede tema sayısı belirtilmemiş', 'Trendyol/Hepsiburada gibi pazaryeri entegrasyonları net duyurulmamış', 'Native mobil yönetim uygulaması bilgisi yok', 'AI özellikleri sunulmuyor', 'Komisyon politikası net duyurulmamış', 'Ekosistem/eklenti pazarı henüz yok'],
-    scores: { fiyat: 7, ozellik: 6, kolaylik: 9, destek: 7, ekosistem: 4 },
-    bestFor: 'Sade çözüm arayan yeni nesil D2C markalar'
+    trial: 'Belirsiz',
+    features: { themes: null, mobile: null, ai: null, b2b: null, multilang: null, pos: null, payments: null, marketplaces: null },
+    pros: ['Şeffaf 3 paket fiyatı: 1.490₺ / 2.990₺ / 5.990₺ aylık (doğrulandı)', 'Resmi tanıtım: "tek panelden büyütme" — sade UX vaadi', 'Slogan: "100+ entegrasyon odağı" (somut liste verilmemiş)', 'Slogan: "7/24 operasyon izleme mimarisi"'],
+    cons: ['Tema sayısı resmi sitede belirtilmemiş', 'Mobil uygulama, AI, B2B, POS, çok dil ve ödeme yöntemleri ana sayfada listelenmemiş', 'Pazaryeri entegrasyonları (Trendyol/HB/Amazon) net duyurulmamış', 'Müşteri sayısı dinamik sayaç olarak gösterilmiş ("200+" varsayılan değer olabilir)', 'Şirket kuruluş yılı belirtilmemiş', 'Ücretsiz deneme süresi ana sayfada açıkça yer almıyor', 'Komisyon politikası duyurulmamış', 'Detaylar için demo talep / iletişim gerekiyor'],
+    scores: { fiyat: 7, ozellik: 3, kolaylik: 6, destek: 5, ekosistem: 2 },
+    bestFor: 'Demo talep ederek detayları doğrudan platform ekibinden öğrenmek isteyenler'
   },
   {
     id: 'ikas', name: 'ikas', logoCls: 'lg-ikas', logoTxt: 'i',
@@ -515,8 +526,8 @@ const PLATFORMS = [
     pricing: { starter: 'Start ücretsiz', growth: 'Ücretli paketler (resmi sayfada belirsiz)', enterprise: 'Premium özel' },
     trial: '3 gün',
     features: { themes: null, mobile: null, ai: null, b2b: null, multilang: 1, pos: 0, payments: 4, marketplaces: 4 },
-    pros: ['Ücretsiz Start paketi — 0₺ ile başlangıç', 'AWS altyapı, sınırsız ürün ve trafik', '20.000+ aktif Türk kullanıcı', 'Trendyol, Hepsiburada, Amazon, Etsy pazaryeri entegrasyonu', 'iyzico, PayTR, Tami, United Payment ödeme altyapısı', 'Sovos Foriba, Paraşüt, QNB E-Finans e-fatura entegrasyonu', 'Sınırsız dil ve para birimi desteği', 'SSL ve SHA-256 şifreleme', 'Türkçe destek'],
-    cons: ['Ücretsiz deneme yalnızca 3 gün (sektörün altı)', 'Resmi sayfada paket fiyatları açıkça listelenmemiş', 'Tema özelleştirme için Premium paket gerekli', 'Ölçeklendikçe ücret hızla yükseliyor', 'AI özellikleri ana sayfada vurgulanmıyor'],
+    pros: ['Ücretsiz Start paketi — 0₺ ile başlangıç (resmi sayfa)', 'Sınırsız ürün, trafik, dil ve para birimi (resmi sayfa)', '20.000+ kullanıcı (resmi sayfa)', 'Trendyol, Hepsiburada, Amazon, Etsy pazaryeri entegrasyonu (resmi sayfa)', 'iyzico, PayTR, Tami, United Payment ödeme altyapısı (resmi sayfa)', 'Sovos Foriba, Paraşüt, QNB E-Finans, EDM Bilişim e-fatura/muhasebe (resmi sayfa)', 'Aras, HepsiJET, Yurtiçi, DHL Ecommerce, Kolay Gelsin kargo (resmi sayfa)', '256-bit SSL ve SHA-256 şifreleme protokolü (resmi sayfa iddiası)'],
+    cons: ['Ücretsiz deneme yalnızca 3 gün — sektör ortalamasının altı', 'Resmi sayfada ücretli paketlerin tam fiyatları listelenmemiş', 'Tema sayısı net olarak duyurulmamış', 'Mobil yönetim uygulaması, AI ve B2B desteği ana sayfada açıkça vurgulanmamış', 'Resmi sayfa "Paratika" da listeliyor ama Paratika Türkiye\'den çekildi — listenin güncelliği sorgulanabilir'],
     scores: { fiyat: 9, ozellik: 8, kolaylik: 9, destek: 9, ekosistem: 9 },
     bestFor: 'KOBİ ve yeni başlayan D2C markalar'
   },
@@ -793,6 +804,17 @@ PLATFORMS.forEach(p => {
   p.total = +((s.fiyat + s.ozellik + s.kolaylik + s.destek + s.ekosistem) / 5).toFixed(1);
 });
 
+// Veri Şeffaflığı: platformun resmi sitesinde ne kadar bilgi yayınladığı (0-10)
+// 10 = fiyat/özellik/komisyon/müşteri sayısı vb. hepsi açık; 0 = hiçbir somut bilgi yok
+const TRANSPARENCY = {
+  hemenmagaza: 3, ikas: 5, ticimax: 4, ideasoft: 9, tsoft: 2,
+  platinmarket: 5, faprika: 7,
+  shopify: 10, bigcommerce: 7, wix: 8, squarespace: 7, webflow: 10,
+  ecwid: 10, squareonline: 8, bigcartel: 10, shoplazza: 6,
+  woocommerce: 9, magento: 7, prestashop: 9, opencart: 7,
+  salesforce: 5, commercetools: 6
+};
+
 const URL_MAP = {
   hemenmagaza: 'https://hemenmagaza.com',
   ikas: 'https://www.ikas.com/tr',
@@ -897,6 +919,7 @@ function renderCards() {
       <div class="total-score">
         <div class="big">${p.total}/10</div>
         <div class="lbl">${p.customers} · ${p.foundedNote}</div>
+        ${(() => { const t = TRANSPARENCY[p.id]; if (t === undefined) return ''; const cls = t >= 8 ? 't-high' : (t >= 5 ? 't-mid' : 't-low'); return `<div class="transparency-line" title="Resmi sitede kamuya açıklanan bilgi miktarı. Yüksek = fiyat/özellik/komisyon/müşteri sayısı şeffaf."><span class="lbl">🔍 Şeffaflık:</span><span class="transparency-bar"><div class="${cls}-bg" style="width:${t*10}%"></div></span><span class="transparency-num ${cls}">${t}/10</span></div>`; })()}
       </div>
 
       <div class="price-row">
@@ -970,6 +993,7 @@ function renderTable() {
     { k: 'POS', f: p => boolFmt(p.features?.pos) },
     { k: 'Ödeme yöntemi', f: p => featFmt(p.features?.payments) },
     { k: 'Pazaryeri', f: p => featFmt(p.features?.marketplaces) },
+    { k: 'Veri Şeffaflığı', f: p => { const t = TRANSPARENCY[p.id]; if (t === undefined) return '–'; const cls = t >= 8 ? 'check' : (t >= 5 ? 'partial' : 'cross'); return `<span class="${cls}">${t}/10</span>`; } },
     { k: 'Toplam Skor', f: p => `${p.total}/10` },
     { k: 'Fiyat', f: p => `${p.scores.fiyat}/10` },
     { k: 'Özellik', f: p => `${p.scores.ozellik}/10` },
@@ -1081,7 +1105,9 @@ function renderCompareResult() {
     { key: '🔗 Pazaryeri', a: featFmt(fA.marketplaces), b: featFmt(fB.marketplaces), winner: cmp(fA.marketplaces || 0, fB.marketplaces || 0) }
   ];
 
+  const tA = TRANSPARENCY[a.id], tB = TRANSPARENCY[b.id];
   const scoreRows = [
+    { key: 'Veri Şeffaflığı', a: tA !== undefined ? `${tA}/10` : '?', b: tB !== undefined ? `${tB}/10` : '?', winner: cmp(tA || 0, tB || 0) },
     { key: 'Fiyat skoru', a: `${a.scores.fiyat}/10`, b: `${b.scores.fiyat}/10`, winner: cmp(a.scores.fiyat, b.scores.fiyat) },
     { key: 'Özellik skoru', a: `${a.scores.ozellik}/10`, b: `${b.scores.ozellik}/10`, winner: cmp(a.scores.ozellik, b.scores.ozellik) },
     { key: 'Kolaylık', a: `${a.scores.kolaylik}/10`, b: `${b.scores.kolaylik}/10`, winner: cmp(a.scores.kolaylik, b.scores.kolaylik) },
