@@ -120,17 +120,20 @@ function sanitizeValue(v) {
   return v;
 }
 
+// Escape-aware single-quoted string: ' followed by chars that are not ' or \, or escaped \. then closing '
+const QSTR = `'(?:[^'\\\\]|\\\\.)*'`;
+
 function replaceFieldOnce(html, platformId, parent, field, newValue) {
   const clean = sanitizeValue(newValue);
   if (!clean) return html;
-  const re = new RegExp(`(id:\\s*'${platformId}'[\\s\\S]{0,2000}?${parent}:\\s*\\{[^}]{0,400}?${field}:\\s*)'[^']*'`);
+  const re = new RegExp(`(id:\\s*'${platformId}'[\\s\\S]{0,2000}?${parent}:\\s*\\{[\\s\\S]{0,400}?${field}:\\s*)${QSTR}`);
   return html.replace(re, `$1'${clean}'`);
 }
 
 function replaceTopLevelField(html, platformId, field, newValue) {
   const clean = sanitizeValue(newValue);
   if (!clean) return html;
-  const re = new RegExp(`(id:\\s*'${platformId}'[\\s\\S]{0,2000}?${field}:\\s*)'[^']*'`);
+  const re = new RegExp(`(id:\\s*'${platformId}'[\\s\\S]{0,2000}?\\b${field}:\\s*)${QSTR}`);
   return html.replace(re, `$1'${clean}'`);
 }
 
