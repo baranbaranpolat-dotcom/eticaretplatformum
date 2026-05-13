@@ -39,6 +39,10 @@
   .btn:hover { background: var(--card-hover); border-color: var(--accent); }
   .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; border-color: transparent; }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.35); }
+  .lang-toggle { display: inline-flex; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .lang-toggle button { background: transparent; border: none; padding: 6px 10px; font-size: 12px; font-weight: 700; color: var(--text-mute); cursor: pointer; transition: all 0.15s; }
+  .lang-toggle button.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; }
+  .lang-toggle button:not(.active):hover { color: var(--accent-2); background: var(--card-hover); }
 
   .update-banner { background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); border-bottom: 1px solid rgba(16,185,129,0.25); padding: 6px 16px; text-align: center; font-size: 12px; color: var(--accent-2); font-weight: 500; }
 
@@ -335,8 +339,12 @@
   <div class="container nav">
     <div class="logo"><span class="dot"></span> E-Ticaret Platformu Karşılaştırma</div>
     <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button id="langTR" class="active" data-lang="tr">TR</button>
+        <button id="langEN" data-lang="en">EN</button>
+      </div>
       <button class="btn" id="themeBtn" title="Tema değiştir">🌙</button>
-      <button class="btn btn-primary" onclick="document.querySelector('[data-tab=quiz]').click(); document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Bana Uygun Olan?</button>
+      <button class="btn btn-primary" id="quizBtn" onclick="document.querySelector('[data-tab=quiz]').click(); document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Bana Uygun Olan?</button>
     </div>
   </div>
 </header>
@@ -523,11 +531,11 @@ const PLATFORMS = [
     sub: 'KOBİ favorisi, hızla büyüyen', badge: { txt: 'POPÜLER', cls: 'badge-pop' },
     region: 'TR', model: 'SaaS', country: '🇹🇷', popularity: 9, foundedYear: 2017,
     foundedNote: '2017, Türkiye', customers: '20.000+ kullanıcı',
-    pricing: { starter: 'Start ücretsiz', growth: 'Ücretli paketler (resmi sayfada belirsiz)', enterprise: 'Premium özel' },
-    trial: '3 gün',
+    pricing: { starter: 'Start paketi ücretsiz (süre sınırı belirtilmemiş)', growth: 'Premium paketleri (fiyat resmi sayfada belirsiz)', enterprise: 'Premium özel' },
+    trial: 'Start sürekli ücretsiz · Premium denemek için 3 gün',
     features: { themes: null, mobile: null, ai: null, b2b: null, multilang: 1, pos: 0, payments: 4, marketplaces: 4 },
-    pros: ['Ücretsiz Start paketi — 0₺ ile başlangıç (resmi sayfa)', 'Sınırsız ürün, trafik, dil ve para birimi (resmi sayfa)', '20.000+ kullanıcı (resmi sayfa)', 'Trendyol, Hepsiburada, Amazon, Etsy pazaryeri entegrasyonu (resmi sayfa)', 'iyzico, PayTR, Tami, United Payment ödeme altyapısı (resmi sayfa)', 'Sovos Foriba, Paraşüt, QNB E-Finans, EDM Bilişim e-fatura/muhasebe (resmi sayfa)', 'Aras, HepsiJET, Yurtiçi, DHL Ecommerce, Kolay Gelsin kargo (resmi sayfa)', '256-bit SSL ve SHA-256 şifreleme protokolü (resmi sayfa iddiası)'],
-    cons: ['Ücretsiz deneme yalnızca 3 gün — sektör ortalamasının altı', 'Resmi sayfada ücretli paketlerin tam fiyatları listelenmemiş', 'Tema sayısı net olarak duyurulmamış', 'Mobil yönetim uygulaması, AI ve B2B desteği ana sayfada açıkça vurgulanmamış', 'Resmi sayfa "Paratika" da listeliyor ama Paratika Türkiye\'den çekildi — listenin güncelliği sorgulanabilir'],
+    pros: ['Start paketi ücretsiz başlangıç — süre kısıtı resmi sayfada yer almıyor (sektörde kalıcı ücretsiz olarak kullanılıyor)', 'Sınırsız ürün, trafik, dil ve para birimi (resmi sayfa)', '20.000+ kullanıcı (resmi sayfa)', 'Trendyol, Hepsiburada, Amazon, Etsy pazaryeri entegrasyonu (resmi sayfa)', 'iyzico, PayTR, Tami, United Payment ödeme altyapısı (resmi sayfa)', 'Sovos Foriba, Paraşüt, QNB E-Finans, EDM Bilişim e-fatura/muhasebe (resmi sayfa)', 'Aras, HepsiJET, Yurtiçi, DHL Ecommerce, Kolay Gelsin kargo (resmi sayfa)', '256-bit SSL ve SHA-256 şifreleme protokolü (resmi sayfa iddiası)'],
+    cons: ['Premium paketleri denemek için yalnızca 3 gün ücretsiz', 'Resmi sayfada Premium paketlerin tam fiyatları listelenmemiş', 'Tema sayısı net olarak duyurulmamış', 'Mobil yönetim uygulaması, AI ve B2B desteği ana sayfada açıkça vurgulanmamış', 'Resmi sayfa "Paratika" da listeliyor ama Paratika Türkiye\'den çekildi — listenin güncelliği sorgulanabilir'],
     scores: { fiyat: 9, ozellik: 8, kolaylik: 9, destek: 9, ekosistem: 9 },
     bestFor: 'KOBİ ve yeni başlayan D2C markalar'
   },
@@ -804,6 +812,388 @@ PLATFORMS.forEach(p => {
   p.total = +((s.fiyat + s.ozellik + s.kolaylik + s.destek + s.ekosistem) / 5).toFixed(1);
 });
 
+// ============ I18N: UI Strings ============
+let LANG = (localStorage.getItem('eticaret-lang') === 'en') ? 'en' : 'tr';
+
+const I18N = {
+  tr: {
+    title: 'E-Ticaret Platformu Karşılaştırma — Türkiye & Dünya',
+    updateBanner_prefix: '🔄 Son güncelleme:',
+    updateBanner_suffix: '· Otomatik günlük yenileme aktif',
+    logo: 'E-Ticaret Platformu Karşılaştırma',
+    themeBtn_title: 'Tema değiştir',
+    quizBtn: 'Bana Uygun Olan?',
+    hero_badge: 'Bağımsız Karşılaştırma · 22 Platform · 2026',
+    hero_h1_grad: 'E-ticaret platformunu',
+    hero_h1_after: 'tarafsız kıyasla',
+    hero_p: '7 Türk + 15 küresel altyapı; fiyat, özellik, kullanım kolaylığı, ekosistem ve destek başlıklarında yan yana. Hiçbir markaya kayırma yok.',
+    stat_platform: 'Platform',
+    stat_tr: 'Türkiye 🇹🇷',
+    stat_global: 'Dünya 🌍',
+    stat_features: 'Özellik / Platform',
+    stat_lowest: 'En düşük başlangıç',
+    tab_cards: '📋 Platform Kartları',
+    tab_table: '📊 Karşılaştırma Tablosu',
+    tab_compare: '🆚 İki Marka Kıyasla',
+    tab_quiz: '🎯 Bana Uygun Olan?',
+    search_placeholder: 'Platform ara (ör: Shopify, ikas, WooCommerce)...',
+    chip_all: 'Tümü', chip_tr: '🇹🇷 Türkiye', chip_global: '🌍 Dünya',
+    chip_brands: '🏷️ Markalar', chip_total: 'Tümü',
+    chip_saas: 'SaaS', chip_oss: 'Açık Kaynak', chip_enterprise: 'Kurumsal',
+    sort_score: 'Skor (yüksek → düşük)',
+    sort_name: 'Alfabetik',
+    sort_pop: 'Popülerlik',
+    sort_founded: 'En yeni',
+    cards_h2: 'Platform Kartları',
+    cards_p: '8 özellik pill\'i, 5 kriter skoru ve detaylı artı/eksiler bir arada.',
+    table_h2: 'Detaylı Karşılaştırma Tablosu',
+    table_p: 'Tüm platformlar yan yana. Yatay kaydır.',
+    compare_h2: 'İki Markayı Yan Yana Kıyasla',
+    compare_p: 'Aşağıdan iki platform seç — tüm kriterlerde detaylı yan yana karşılaştırma görüntülenir.',
+    quiz_h2: 'Hangisi senin için doğru?',
+    quiz_p: '5 hızlı soru — 22 platform arasından profiline en uygun 5\'ini önerelim.',
+    count_shown: 'platform gösteriliyor',
+    count_total: 'platform',
+    empty_msg: '🔍 Aramana uygun platform bulunamadı. Filtreleri sıfırlamayı dene.',
+    card_start: 'Başlangıç',
+    card_trial: 'deneme',
+    card_features: 'Özellikler',
+    card_pros: '+ Artılar',
+    card_cons: '− Eksiler',
+    card_bestfor: 'En uygun',
+    score_price: 'Fiyat', score_feat: 'Özellik', score_easy: 'Kolay', score_support: 'Destek', score_eco: 'Ekosistem',
+    transparency_lbl: '🔍 Şeffaflık:',
+    transparency_tip: 'Resmi sitede kamuya açıklanan bilgi miktarı. Yüksek = fiyat/özellik/komisyon/müşteri sayısı şeffaf.',
+    feat_themes: 'Tema sayısı', feat_mobile: 'Mobil yönetim app', feat_ai: 'Yapay zeka özellikleri',
+    feat_b2b: 'B2B desteği', feat_multilang: 'Çok dilli site', feat_pos: 'POS / Perakende',
+    feat_payments: 'Ödeme yöntemi', feat_marketplaces: 'Pazaryeri entegrasyonu',
+    feat_label_themes: 'Tema', feat_label_mobile: 'Mobil', feat_label_ai: 'AI', feat_label_b2b: 'B2B',
+    feat_label_multilang: 'Dil', feat_label_pos: 'POS', feat_label_payments: 'Ödeme', feat_label_marketplaces: 'Pazaryeri',
+    val_var: 'Var', val_partial: 'Kısmen', val_yok: 'Yok', val_unknown: 'Belirsiz', val_unknown_full: 'Belirsiz (kamuya açık veri yok)',
+    tbl_kriter: 'Kriter',
+    tbl_start: 'Başlangıç', tbl_top: 'Üst paket', tbl_trial: 'Deneme', tbl_founded: 'Kuruluş', tbl_customers: 'Müşteri',
+    tbl_model: 'Model', tbl_region: 'Bölge',
+    tbl_themes: 'Tema sayısı', tbl_mobile: 'Mobil app', tbl_ai: 'AI', tbl_b2b: 'B2B', tbl_multilang: 'Çok dil',
+    tbl_pos: 'POS', tbl_payments: 'Ödeme yöntemi', tbl_marketplaces: 'Pazaryeri',
+    tbl_transparency: 'Veri Şeffaflığı', tbl_total: 'Toplam Skor',
+    tbl_price_score: 'Fiyat', tbl_feat_score: 'Özellik', tbl_easy_score: 'Kolaylık', tbl_support_score: 'Destek', tbl_eco_score: 'Ekosistem',
+    tr_label: '🇹🇷 Türkiye', global_label: 'Global',
+    compare_swap_title: 'A ve B\'yi yer değiştir',
+    compare_same: 'Aynı platformu seçtin — farklı 2 platform seçerek kıyasla.',
+    compare_h_pricing: 'Fiyat & Genel Bilgiler',
+    compare_h_features: 'Özellikler',
+    compare_h_scores: 'Skorlar',
+    compare_pros_a_prefix: '+ ', compare_pros_a_suffix: ' artıları',
+    compare_cons_a_prefix: '− ', compare_cons_a_suffix: ' eksileri',
+    compare_verdict_label: '🎯 Karar:',
+    compare_total_lbl: 'Toplam skor',
+    compare_meta_suffix: 'müşteri',
+    compare_row_start: 'Başlangıç fiyatı', compare_row_growth: 'Büyüme paketi', compare_row_enterprise: 'Üst paket',
+    compare_row_trial: 'Ücretsiz deneme', compare_row_founded: 'Kuruluş yılı', compare_row_customers: 'Müşteri tabanı',
+    compare_row_region: 'Bölge', compare_row_model: 'Model',
+    compare_feat_themes: '🎨 Tema sayısı', compare_feat_mobile: '📱 Mobil app', compare_feat_ai: '🤖 AI özellikler',
+    compare_feat_b2b: '🏪 B2B', compare_feat_multilang: '🌐 Çok dil', compare_feat_pos: '🛒 POS',
+    compare_feat_payments: '💳 Ödeme yöntemi', compare_feat_marketplaces: '🔗 Pazaryeri',
+    compare_score_price: 'Fiyat skoru', compare_score_feat: 'Özellik skoru', compare_score_easy: 'Kolaylık',
+    compare_score_support: 'Destek', compare_score_eco: 'Ekosistem', compare_score_trans: 'Veri Şeffaflığı',
+    compare_v_a_leads: ' toplam skorda öne çıkıyor',
+    compare_v_b_leads: ' toplam skorda öne çıkıyor',
+    compare_v_tie: 'İki platform da eşit toplam skorda',
+    compare_v_priorities: 'Önceliklerine göre karar ver.',
+    compare_v_tr_focus: ' Türkiye odaklı,',
+    compare_v_global_focus: 'global.',
+    compare_v_budget_left: 'Bütçen sıkıysa',
+    compare_v_budget_right: ', özellik istiyorsan',
+    compare_v_budget_end: 'tercih edilebilir.',
+    quiz_alert: 'Lütfen tüm soruları yanıtlayın.',
+    quiz_q1: '1. Aylık bütçe?', quiz_q1_free: 'Ücretsiz / 0₺', quiz_q1_low: '1.500₺\'ye kadar', quiz_q1_mid: '1.500₺ – 4.000₺', quiz_q1_high: '4.000₺ – 10.000₺', quiz_q1_xhigh: '10.000₺+',
+    quiz_q2: '2. Hangi pazarda satacaksın?', quiz_q2_tr: 'Sadece Türkiye', quiz_q2_export: 'Yurt dışı (e-ihracat)', quiz_q2_global: 'Global / her yerde',
+    quiz_q3: '3. E-ticaret tecrübesi?', quiz_q3_new: 'Yeni başlıyorum', quiz_q3_some: 'Az tecrübem var', quiz_q3_pro: 'Aktif satıyorum', quiz_q3_ent: 'Kurumsal operasyon',
+    quiz_q4: '4. Teknik bilgi?', quiz_q4_none: 'Yok, hazır panel istiyorum', quiz_q4_basic: 'Temel (admin paneli yönetebilirim)', quiz_q4_dev: 'Geliştiriciyim / ekibim var',
+    quiz_q5: '5. En öncelikli olan?', quiz_q5_simple: 'Sadelik / hızlı kurulum', quiz_q5_custom: 'Özelleştirme / esneklik', quiz_q5_ecosystem: 'Pazaryeri & entegrasyon', quiz_q5_design: 'Tasarım / estetik', quiz_q5_scale: 'Ölçeklenebilirlik',
+    quiz_show: 'Önerimi Göster',
+    quiz_top_label: '🎯 Sana en uygun:',
+    quiz_acc: 'Cevaplarına göre:',
+    footer_p1: 'Veriler platformların resmi sitelerinden ve kamuya açık kaynaklardan derlenmiştir. Fiyatlar, tema sayıları, müşteri sayıları ve entegrasyon listeleri zaman içinde değişir. <strong style="color:var(--accent-2)">"?" ile işaretli alanlar</strong> platformun resmi sitesinde net olarak yayınlanmamış, doğrulanamamış verilerdir.',
+    footer_p2: 'Karar vermeden önce mutlaka ilgili platformun resmi sitesini kontrol edin. Bu sayfa bağımsızdır; hiçbir platformla resmi/iş ortaklığı yoktur.',
+    footer_p3: 'Bağımsız karşılaştırma · v5.0 ·',
+    footer_github: 'GitHub',
+    skip_link: 'İçeriğe atla'
+  },
+  en: {
+    title: 'E-Commerce Platform Comparison — Turkey & Global',
+    updateBanner_prefix: '🔄 Last updated:',
+    updateBanner_suffix: '· Daily auto-refresh active',
+    logo: 'E-Commerce Platform Comparison',
+    themeBtn_title: 'Toggle theme',
+    quizBtn: 'Find My Match',
+    hero_badge: 'Independent Comparison · 22 Platforms · 2026',
+    hero_h1_grad: 'Compare e-commerce',
+    hero_h1_after: 'platforms impartially',
+    hero_p: '7 Turkish + 15 global platforms; price, features, ease of use, ecosystem and support — side by side. No bias toward any brand.',
+    stat_platform: 'Platforms',
+    stat_tr: 'Turkey 🇹🇷',
+    stat_global: 'Global 🌍',
+    stat_features: 'Features per platform',
+    stat_lowest: 'Lowest starting price',
+    tab_cards: '📋 Platform Cards',
+    tab_table: '📊 Comparison Table',
+    tab_compare: '🆚 Compare Two Brands',
+    tab_quiz: '🎯 Find My Match',
+    search_placeholder: 'Search platforms (e.g. Shopify, ikas, WooCommerce)...',
+    chip_all: 'All', chip_tr: '🇹🇷 Turkey', chip_global: '🌍 Global',
+    chip_brands: '🏷️ Brands', chip_total: 'All',
+    chip_saas: 'SaaS', chip_oss: 'Open Source', chip_enterprise: 'Enterprise',
+    sort_score: 'Score (high → low)',
+    sort_name: 'Alphabetical',
+    sort_pop: 'Popularity',
+    sort_founded: 'Newest',
+    cards_h2: 'Platform Cards',
+    cards_p: '8 feature pills, 5 criteria scores, and detailed pros & cons together.',
+    table_h2: 'Detailed Comparison Table',
+    table_p: 'All platforms side by side. Scroll horizontally.',
+    compare_h2: 'Compare Two Brands Side by Side',
+    compare_p: 'Select two platforms below — a detailed side-by-side comparison appears across all criteria.',
+    quiz_h2: 'Which one fits you?',
+    quiz_p: '5 quick questions — we recommend the top 5 platforms from 22 based on your profile.',
+    count_shown: 'platforms shown',
+    count_total: 'platforms',
+    empty_msg: '🔍 No platforms match your search. Try resetting filters.',
+    card_start: 'Starting',
+    card_trial: 'trial',
+    card_features: 'Features',
+    card_pros: '+ Pros',
+    card_cons: '− Cons',
+    card_bestfor: 'Best for',
+    score_price: 'Price', score_feat: 'Features', score_easy: 'Ease', score_support: 'Support', score_eco: 'Ecosystem',
+    transparency_lbl: '🔍 Transparency:',
+    transparency_tip: 'How much information is publicly disclosed on the official site. High = pricing/features/commission/customer count are transparent.',
+    feat_themes: 'Number of themes', feat_mobile: 'Mobile admin app', feat_ai: 'AI features',
+    feat_b2b: 'B2B support', feat_multilang: 'Multilingual site', feat_pos: 'POS / Retail',
+    feat_payments: 'Payment methods', feat_marketplaces: 'Marketplace integrations',
+    feat_label_themes: 'Themes', feat_label_mobile: 'Mobile', feat_label_ai: 'AI', feat_label_b2b: 'B2B',
+    feat_label_multilang: 'Lang', feat_label_pos: 'POS', feat_label_payments: 'Pay', feat_label_marketplaces: 'Markets',
+    val_var: 'Yes', val_partial: 'Partial', val_yok: 'No', val_unknown: 'Unknown', val_unknown_full: 'Unknown (no public data)',
+    tbl_kriter: 'Criterion',
+    tbl_start: 'Starting', tbl_top: 'Top tier', tbl_trial: 'Trial', tbl_founded: 'Founded', tbl_customers: 'Customers',
+    tbl_model: 'Model', tbl_region: 'Region',
+    tbl_themes: 'Themes', tbl_mobile: 'Mobile app', tbl_ai: 'AI', tbl_b2b: 'B2B', tbl_multilang: 'Multi-lang',
+    tbl_pos: 'POS', tbl_payments: 'Payment methods', tbl_marketplaces: 'Marketplaces',
+    tbl_transparency: 'Data Transparency', tbl_total: 'Total Score',
+    tbl_price_score: 'Price', tbl_feat_score: 'Features', tbl_easy_score: 'Ease', tbl_support_score: 'Support', tbl_eco_score: 'Ecosystem',
+    tr_label: '🇹🇷 Turkey', global_label: 'Global',
+    compare_swap_title: 'Swap A and B',
+    compare_same: 'You selected the same platform — pick two different ones to compare.',
+    compare_h_pricing: 'Pricing & General Info',
+    compare_h_features: 'Features',
+    compare_h_scores: 'Scores',
+    compare_pros_a_prefix: '+ ', compare_pros_a_suffix: ' pros',
+    compare_cons_a_prefix: '− ', compare_cons_a_suffix: ' cons',
+    compare_verdict_label: '🎯 Verdict:',
+    compare_total_lbl: 'Total score',
+    compare_meta_suffix: 'customers',
+    compare_row_start: 'Starting price', compare_row_growth: 'Growth tier', compare_row_enterprise: 'Top tier',
+    compare_row_trial: 'Free trial', compare_row_founded: 'Year founded', compare_row_customers: 'Customer base',
+    compare_row_region: 'Region', compare_row_model: 'Model',
+    compare_feat_themes: '🎨 Themes', compare_feat_mobile: '📱 Mobile app', compare_feat_ai: '🤖 AI features',
+    compare_feat_b2b: '🏪 B2B', compare_feat_multilang: '🌐 Multilingual', compare_feat_pos: '🛒 POS',
+    compare_feat_payments: '💳 Payment methods', compare_feat_marketplaces: '🔗 Marketplaces',
+    compare_score_price: 'Price score', compare_score_feat: 'Features score', compare_score_easy: 'Ease',
+    compare_score_support: 'Support', compare_score_eco: 'Ecosystem', compare_score_trans: 'Data Transparency',
+    compare_v_a_leads: ' leads in total score',
+    compare_v_b_leads: ' leads in total score',
+    compare_v_tie: 'Both platforms have the same total score',
+    compare_v_priorities: 'Decide based on your priorities.',
+    compare_v_tr_focus: ' is Turkey-focused,',
+    compare_v_global_focus: 'is global.',
+    compare_v_budget_left: 'On a tight budget try',
+    compare_v_budget_right: ', for more features try',
+    compare_v_budget_end: 'instead.',
+    quiz_alert: 'Please answer all questions.',
+    quiz_q1: '1. Monthly budget?', quiz_q1_free: 'Free / $0', quiz_q1_low: 'Up to $50', quiz_q1_mid: '$50 – $150', quiz_q1_high: '$150 – $400', quiz_q1_xhigh: '$400+',
+    quiz_q2: '2. Which market will you sell in?', quiz_q2_tr: 'Turkey only', quiz_q2_export: 'Cross-border (export)', quiz_q2_global: 'Global / everywhere',
+    quiz_q3: '3. E-commerce experience?', quiz_q3_new: 'Just starting', quiz_q3_some: 'Some experience', quiz_q3_pro: 'Actively selling', quiz_q3_ent: 'Enterprise operations',
+    quiz_q4: '4. Technical know-how?', quiz_q4_none: 'None — I want a ready-made panel', quiz_q4_basic: 'Basic (I can use an admin panel)', quiz_q4_dev: 'I am a developer / have a team',
+    quiz_q5: '5. Top priority?', quiz_q5_simple: 'Simplicity / fast setup', quiz_q5_custom: 'Customization / flexibility', quiz_q5_ecosystem: 'Marketplaces & integrations', quiz_q5_design: 'Design / aesthetics', quiz_q5_scale: 'Scalability',
+    quiz_show: 'Show My Match',
+    quiz_top_label: '🎯 Best fit for you:',
+    quiz_acc: 'Based on your answers:',
+    footer_p1: 'Data is compiled from the official sites of the platforms and publicly available sources. Prices, theme counts, customer counts and integration lists change over time. <strong style="color:var(--accent-2)">Fields marked with "?"</strong> are not clearly published on the platform\'s official site and could not be verified independently.',
+    footer_p2: 'Always verify details on the relevant platform\'s official site before deciding. This page is independent; there is no official or business partnership with any platform.',
+    footer_p3: 'Independent comparison · v5.0 ·',
+    footer_github: 'GitHub',
+    skip_link: 'Skip to content'
+  }
+};
+
+// ============ TRANSLATIONS: Platform content (TR → EN) ============
+const TR_EN = {
+  // sub
+  'Yeni nesil sade panel': 'New-generation simple panel',
+  'KOBİ favorisi, hızla büyüyen': 'SMB favorite, rapidly growing',
+  'Kurumsal markalar için': 'For enterprise brands',
+  'Köklü, anahtar teslim': 'Established, turnkey solution',
+  'B2B odaklı eski platform': 'Legacy B2B-focused platform',
+  'Köklü, çoklu özellik paketi': 'Established, feature-rich package',
+  'Modern KOBİ çözümü': 'Modern SMB solution',
+  "Dünyanın en büyük e-ticaret SaaS'ı": "World's largest e-commerce SaaS",
+  "Shopify'ın yakın rakibi": "Shopify's closest competitor",
+  'Drag-drop site + ticaret': 'Drag-and-drop site + commerce',
+  'Estetik tasarım odaklı': 'Design-aesthetics focused',
+  'Tasarımcılar için no-code': 'No-code for designers',
+  'Mevcut siteye eklenebilir': 'Add-on for existing sites',
+  'Square POS ile entegre': 'Integrated with Square POS',
+  'Sanatçı & yaratıcı odaklı': 'Artist & creator focused',
+  'Sınır ötesi e-ticaret': 'Cross-border e-commerce',
+  "WordPress'in e-ticaret eklentisi": "WordPress's e-commerce plugin",
+  'Enterprise açık kaynak': 'Enterprise open source',
+  "Avrupa'nın açık kaynak çözümü": "Europe's open-source solution",
+  'Hafif açık kaynak çözüm': 'Lightweight open-source solution',
+  'Enterprise B2C/B2B': 'Enterprise B2C/B2B',
+  'Headless, API-first': 'Headless, API-first',
+
+  // Badges
+  'YENİ': 'NEW', 'POPÜLER': 'POPULAR', 'KURUMSAL': 'ENTERPRISE', 'KÖKLÜ': 'ESTABLISHED',
+  'KRAL': 'KING', 'NICHE': 'NICHE', 'ÜCRETSİZ': 'FREE', 'HEADLESS': 'HEADLESS', 'YENİ NESİL': 'NEW-GEN',
+
+  // foundedNote
+  'Yeni': 'New', 'Belirsiz': 'Unspecified',
+  '2017, Türkiye': '2017, Turkey', '2010, Türkiye': '2010, Turkey', '2005, Türkiye': '2005, Turkey',
+  '22 yıllık tecrübe': '22+ years in market', 'Türkiye': 'Turkey',
+  '2006, Kanada': '2006, Canada', '2009, ABD': '2009, USA', '2006, İsrail': '2006, Israel',
+  '2003, ABD': '2003, USA', '2013, ABD': '2013, USA', '2009, ABD (Lightspeed)': '2009, USA (Lightspeed)',
+  '2018 (Weebly satın alımı)': '2018 (Weebly acquisition)', '2005, ABD': '2005, USA',
+  '2017, Singapur/Çin': '2017, Singapore/China', '2008, ABD (Automattic)': '2008, USA (Automattic)',
+  '2008, ABD (Adobe)': '2008, USA (Adobe)', '2007, Fransa': '2007, France',
+  '2010, İngiltere': '2010, UK', '2004 (Demandware), Salesforce 2016': '2004 (Demandware), Salesforce 2016',
+  '2006, Almanya': '2006, Germany',
+
+  // customers
+  '200+ mağaza': '200+ stores', '200+ kullanıcı': '200+ users',
+  '20.000+ kullanıcı': '20,000+ users', '30.000+ marka': '30,000+ brands',
+  '50.000+ firma': '50,000+ companies', 'Kurumsal portföy': 'Enterprise portfolio',
+  '5.000+ müşteri': '5,000+ customers', '3.000+ müşteri': '3,000+ customers',
+  'Milyonlarca mağaza': 'Millions of stores', '60.000+': '60,000+',
+  '200M+ kullanıcı (genel)': '200M+ users (general)', '4M+ site': '4M+ sites',
+  '3.5M+ site': '3.5M+ sites', '1.5M+': '1.5M+', 'Geniş kullanıcı tabanı': 'Wide user base',
+  'Geniş': 'Wide', 'Geniş yaratıcı topluluk': 'Wide creative community',
+  '650.000+ mağaza': '650,000+ stores', '360.000+': '360,000+',
+  '4.000.000+ mağaza': '4,000,000+ stores', '200.000+ büyük marka': '200,000+ major brands',
+  '300.000+ mağaza': '300,000+ stores', '250.000+ mağaza': '250,000+ stores',
+  '350.000+ mağaza': '350,000+ stores', '2.000+ büyük marka': '2,000+ major brands',
+  '300+ büyük marka': '300+ major brands', '600+ küresel işletme': '600+ global enterprises',
+  'Belirsiz (sayfa dinamik sayaç)': 'Unspecified (page uses dynamic counter)',
+  '20.000+ kullanıcı (resmi sayfa)': '20,000+ users (official page)',
+  '30.000+ marka (resmi sayfa)': '30,000+ brands (official page)',
+  '50.000+ firma (resmi sayfa)': '50,000+ companies (official page)',
+  '5.000+ müşteri (resmi sayfa)': '5,000+ customers (official page)',
+  '650.000+ mağaza (resmi sayfa)': '650,000+ stores (official page)',
+  '4.000.000+ mağaza (resmi sayfa iddiası)': '4,000,000+ stores (official claim)',
+  '250.000+ merchant (resmi sayfa)': '250,000+ merchants (official page)',
+  '600+ küresel işletme (resmi sayfa)': '600+ global enterprises (official page)',
+
+  // pricing common
+  'Özel teklif': 'Custom quote',
+  'Resmi sayfada belirsiz': 'Not disclosed on official page',
+  'Kurumsal teklif': 'Enterprise quote',
+  'Plugin ücretsiz': 'Plugin free',
+  'Plugin ücretsiz (açık kaynak)': 'Plugin free (open source)',
+  'Açık kaynak ücretsiz (sektör bilgisi)': 'Free open source (industry knowledge)',
+  'Magento Open Source ücretsiz (genel kanı)': 'Magento Open Source free (general knowledge)',
+  'Classic indirme ücretsiz (resmi sayfa)': 'Classic download free (official page)',
+  'Hosting + eklenti maliyeti kullanıcıya ait': 'Hosting + extension cost on user',
+  'Hosting + dev maliyeti — kullanıcıya ait': 'Hosting + dev cost — on user',
+  'Premium eklenti maliyetleri kullanıcıya ait': 'Premium extension costs on user',
+  'Hosted ücretli': 'Hosted (paid)',
+  'Enterprise ücretli': 'Enterprise (paid)',
+  'Kurumsal sözleşme (kamuya açıklanmıyor)': 'Enterprise contract (not publicly disclosed)',
+  'Adobe Commerce: kurumsal sözleşme (5-6 haneli yıllık)': 'Adobe Commerce: enterprise contract (5-6 figure annual)',
+  'OpenCart Cloud / Enterprise alternatifleri mevcut': 'OpenCart Cloud / Enterprise options available',
+  'Pro 19.900₺/ay': 'Pro 19,900₺/mo', 'Entegre 64.900₺/ay': 'Integrated 64,900₺/mo', 'Platinum 84.900₺/ay': 'Platinum 84,900₺/mo',
+  '1.490₺/ay': '1,490₺/mo', '2.990₺/ay': '2,990₺/mo', '5.990₺/ay': '5,990₺/mo',
+  'Start paketi ücretsiz (süre sınırı belirtilmemiş)': 'Start package free (no time limit stated)',
+  'Premium paketleri (fiyat resmi sayfada belirsiz)': 'Premium tiers (pricing not on official page)',
+  'Premium özel': 'Premium custom',
+  'Belirsiz (sayfa içeriği kırpıldı)': 'Unspecified (page content was truncated)',
+  'Aylık/yıllık seçenek var — somut fiyat sayfada gösterilmedi': 'Monthly/annual options — specific prices not shown on page',
+  'Basic $19/ay (yıllık)': 'Basic $19/mo (annual)',
+  'Grow $54/ay': 'Grow $54/mo',
+  'Advanced $299 / Plus $2.300+': 'Advanced $299 / Plus $2,300+',
+  'Standard $29/ay (yıllık)': 'Standard $29/mo (annual)',
+  'Plus $74/ay (yıllık)': 'Plus $74/mo (annual)',
+  'Advanced $212/ay (yıllık)': 'Advanced $212/mo (annual)',
+  'Starter $5/ay (10 ürün)': 'Starter $5/mo (10 products)',
+  'Venture $35/ay (100 ürün) / Business $65/ay (2.500 ürün)': 'Venture $35/mo (100 products) / Business $65/mo (2,500 products)',
+  'Unlimited $149/ay': 'Unlimited $149/mo',
+  'Gold $0/ay (5 ürün)': 'Gold $0/mo (5 products)',
+  'Platinum $15/ay (50 ürün)': 'Platinum $15/mo (50 products)',
+  'Diamond $30/ay (500 ürün)': 'Diamond $30/mo (500 products)',
+
+  // trial
+  '30 gün': '30 days', '15 gün': '15 days', '14 gün': '14 days', '7 gün': '7 days',
+  'Belirsiz': 'Unknown', 'Talebe bağlı': 'On request',
+  'Start sürekli ücretsiz · Premium denemek için 3 gün': 'Start always free · 3 days to try Premium',
+  '3 gün ($1/ay 3 ay promo)': '3 days ($1/mo for 3-month promo)',
+  'Resmi sayfada belirsiz': 'Not on official page',
+  'Ücretsiz dene (süre belirsiz)': 'Free trial (duration unspecified)',
+  'Ücretsiz Starter plan': 'Free Starter plan',
+  'Yıllık ödemede %16 indirim': '16% off on annual billing',
+  'Gold paketi kalıcı ücretsiz': 'Gold tier permanently free',
+  '14 gün (resmi sayfa)': '14 days (official page)',
+  'Kayıt gerekmeden önizleme': 'Preview without signup',
+  'Plugin sürekli ücretsiz indirme': 'Plugin always free to download',
+  'Open Source ücretsiz indir': 'Open Source free download',
+  'Classic sürümü ücretsiz indir': 'Classic edition free download',
+  'Ücretsiz indir': 'Free download',
+  'Demo (kurumsal iletişim)': 'Demo (enterprise contact)',
+  'Ücretsiz deneme + kurumsal iletişim (resmi sayfa)': 'Free trial + enterprise contact (official page)',
+
+  // bestFor
+  'Sade çözüm arayan yeni nesil D2C markalar': 'New-generation D2C brands seeking simplicity',
+  'Demo talep ederek detayları doğrudan platform ekibinden öğrenmek isteyenler': 'Those who want to request a demo and get details directly from the platform team',
+  'KOBİ ve yeni başlayan D2C markalar': 'SMBs and new D2C brands',
+  'Orta-büyük markalar, omnichannel/e-ihracat': 'Mid-to-large brands, omnichannel/cross-border',
+  'ERP/muhasebe entegrasyonu kritik olan markalar': 'Brands where ERP/accounting integration is critical',
+  'Mağaza zincirleri, B2B, derin ERP gerektiren markalar': 'Retail chains, B2B, brands needing deep ERP',
+  'Köklü Türk platform tercih eden orta ölçek işletmeler': 'Mid-sized businesses preferring an established Turkish platform',
+  'E-ihracat ve çoklu pazaryeri yapan KOBİ\'ler': 'SMBs doing cross-border + multi-marketplace sales',
+  'Global ölçekli D2C, yurt dışına satan markalar': 'Global D2C brands selling internationally',
+  'Komisyonsuz Shopify alternatifi arayan global markalar': 'Global brands looking for a commission-free Shopify alternative',
+  'Tasarım önemli, ufak-orta ölçek markalar': 'Small-to-mid brands where design matters',
+  'Estetik öncelikli, az ürünlü butik markalar': 'Aesthetic-first boutique brands with small catalogs',
+  'Tasarım odaklı, ajans/tasarımcı ile çalışan markalar': 'Design-focused brands working with agencies/designers',
+  "Var olan bir siteye/blog'a satış ekleyenler": 'Those adding sales to an existing site/blog',
+  "ABD'de fiziksel + online satış yapan butikler": 'US-based boutiques selling physical + online',
+  'Sanatçılar, yaratıcılar, butik el yapımı ürün satanlar': 'Artists, creators, and handmade boutique sellers',
+  "Çin'e veya Asya pazarına ihracat yapanlar": 'Those exporting to China or Asian markets',
+  'Teknik bilgisi olan, full kontrol isteyen markalar': 'Brands with tech know-how wanting full control',
+  'Geliştirici ekibi olan, milyonlarca dolarlık ciro hedefleyen markalar': 'Brands with dev teams targeting millions in revenue',
+  "Avrupa'ya satan, kendi sunucusuna sahip olmak isteyen markalar": 'Brands selling to Europe wanting their own server',
+  "PHP bilgisi olan, hafif çözüm arayan KOBİ'ler": 'SMBs with PHP knowledge looking for a lightweight solution',
+  'Fortune 500, milyar dolar ciro hedefleyen küresel markalar': 'Fortune 500, global brands targeting billion-dollar revenue',
+  'Headless commerce isteyen, geliştirici ekibi olan büyük markalar': 'Large brands wanting headless commerce with dev teams',
+
+  // Common short phrases used in pros/cons
+  '(resmi sayfa)': '(official page)',
+  '(resmi sayfa iddiası)': '(official page claim)',
+  '(sektör bilgisi)': '(industry knowledge)',
+  '(genel kanı)': '(general consensus)',
+  'iddiası': 'claim',
+  'Belirsiz': 'Unknown'
+};
+
+function t(key) { return (I18N[LANG] && I18N[LANG][key]) || key; }
+function tt(text) {
+  if (LANG === 'tr' || text == null) return text;
+  if (TR_EN[text]) return TR_EN[text];
+  // Best-effort partial replacements for compound strings
+  let out = text;
+  for (const [tr, en] of Object.entries(TR_EN)) {
+    if (out.includes(tr)) out = out.split(tr).join(en);
+  }
+  return out;
+}
+
 // Veri Şeffaflığı: platformun resmi sitesinde ne kadar bilgi yayınladığı (0-10)
 // 10 = fiyat/özellik/komisyon/müşteri sayısı vb. hepsi açık; 0 = hiçbir somut bilgi yok
 const TRANSPARENCY = {
@@ -861,15 +1251,15 @@ function filterPlatforms() {
 function featPill(icon, label, value, tipName) {
   let cls = '', display = '', tip = tipName;
   if (typeof value === 'number' && value <= 1 && value > 0) {
-    if (value === 1) { display = '✓'; tip = `${tipName}: Var`; }
-    else if (value === 0.5) { display = '◐'; cls = 'partial'; tip = `${tipName}: Kısmen`; }
+    if (value === 1) { display = '✓'; tip = `${tipName}: ${t('val_var')}`; }
+    else if (value === 0.5) { display = '◐'; cls = 'partial'; tip = `${tipName}: ${t('val_partial')}`; }
   } else if (value === 0) {
-    display = '✗'; cls = 'no'; tip = `${tipName}: Yok`;
+    display = '✗'; cls = 'no'; tip = `${tipName}: ${t('val_yok')}`;
   } else if (typeof value === 'number' && value > 1) {
     display = value >= 100 ? `${value}+` : `${value}`;
     tip = `${tipName}: ${display}`;
   } else {
-    display = '?'; cls = 'unknown'; tip = `${tipName}: Belirsiz (kamuya açık veri yok)`;
+    display = '?'; cls = 'unknown'; tip = `${tipName}: ${t('val_unknown_full')}`;
   }
   return `<div class="feat-pill ${cls}" data-tip="${tip}">
     <div class="icon">${icon}</div>
@@ -881,7 +1271,7 @@ function renderCards() {
   const list = filterPlatforms();
   const grid = document.getElementById('platformsGrid');
   const empty = document.getElementById('emptyState');
-  document.getElementById('cardCount').textContent = `${list.length} platform gösteriliyor`;
+  document.getElementById('cardCount').textContent = `${list.length} ${t('count_shown')}`;
 
   if (list.length === 0) {
     grid.innerHTML = '';
@@ -903,7 +1293,7 @@ function renderCards() {
           <div class="card-logo ${p.logoCls}" aria-hidden="true">${p.logoTxt}</div>
           <div>
             <h3>${p.name}</h3>
-            <div class="card-sub">${p.sub}</div>
+            <div class="card-sub">${tt(p.sub)}</div>
             <div class="card-meta">
               <span class="meta-pill ${p.region === 'TR' ? 'meta-tr' : 'meta-global'}">${p.country}</span>
               <span class="meta-pill ${p.model === 'SaaS' ? 'meta-saas' : (p.model === 'OSS' ? 'meta-oss' : 'meta-ent')}">${p.model}</span>
@@ -911,58 +1301,58 @@ function renderCards() {
           </div>
         </div>
         <div class="card-head-right">
-          ${p.badge ? `<span class="badge ${p.badge.cls}">${p.badge.txt}</span>` : ''}
+          ${p.badge ? `<span class="badge ${p.badge.cls}">${tt(p.badge.txt)}</span>` : ''}
           ${url ? `<div class="card-link-indicator">${url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')} ↗</div>` : ''}
         </div>
       </div>
 
       <div class="total-score">
         <div class="big">${p.total}/10</div>
-        <div class="lbl">${p.customers} · ${p.foundedNote}</div>
-        ${(() => { const t = TRANSPARENCY[p.id]; if (t === undefined) return ''; const cls = t >= 8 ? 't-high' : (t >= 5 ? 't-mid' : 't-low'); return `<div class="transparency-line" title="Resmi sitede kamuya açıklanan bilgi miktarı. Yüksek = fiyat/özellik/komisyon/müşteri sayısı şeffaf."><span class="lbl">🔍 Şeffaflık:</span><span class="transparency-bar"><div class="${cls}-bg" style="width:${t*10}%"></div></span><span class="transparency-num ${cls}">${t}/10</span></div>`; })()}
+        <div class="lbl">${tt(p.customers)} · ${tt(p.foundedNote)}</div>
+        ${(() => { const tr = TRANSPARENCY[p.id]; if (tr === undefined) return ''; const cls = tr >= 8 ? 't-high' : (tr >= 5 ? 't-mid' : 't-low'); return `<div class="transparency-line" title="${t('transparency_tip')}"><span class="lbl">${t('transparency_lbl')}</span><span class="transparency-bar"><div class="${cls}-bg" style="width:${tr*10}%"></div></span><span class="transparency-num ${cls}">${tr}/10</span></div>`; })()}
       </div>
 
       <div class="price-row">
-        <div class="label">Başlangıç</div>
-        <div class="val">${p.pricing.starter} <small>· deneme: ${p.trial}</small></div>
+        <div class="label">${t('card_start')}</div>
+        <div class="val">${tt(p.pricing.starter)} <small>· ${t('card_trial')}: ${tt(p.trial)}</small></div>
       </div>
 
       <div class="features-panel">
-        <div class="features-title">Özellikler</div>
+        <div class="features-title">${t('card_features')}</div>
         <div class="features-grid">
-          ${featPill('🎨', 'Tema', f.themes, 'Tema sayısı')}
-          ${featPill('📱', 'Mobil', f.mobile, 'Mobil yönetim app')}
-          ${featPill('🤖', 'AI', f.ai, 'Yapay zeka özellikleri')}
-          ${featPill('🏪', 'B2B', f.b2b, 'B2B desteği')}
-          ${featPill('🌐', 'Dil', f.multilang, 'Çok dilli site')}
-          ${featPill('🛒', 'POS', f.pos, 'POS / Perakende')}
-          ${featPill('💳', 'Ödeme', f.payments, 'Ödeme yöntemi')}
-          ${featPill('🔗', 'Pazaryeri', f.marketplaces, 'Pazaryeri entegrasyonu')}
+          ${featPill('🎨', t('feat_label_themes'), f.themes, t('feat_themes'))}
+          ${featPill('📱', t('feat_label_mobile'), f.mobile, t('feat_mobile'))}
+          ${featPill('🤖', t('feat_label_ai'), f.ai, t('feat_ai'))}
+          ${featPill('🏪', t('feat_label_b2b'), f.b2b, t('feat_b2b'))}
+          ${featPill('🌐', t('feat_label_multilang'), f.multilang, t('feat_multilang'))}
+          ${featPill('🛒', t('feat_label_pos'), f.pos, t('feat_pos'))}
+          ${featPill('💳', t('feat_label_payments'), f.payments, t('feat_payments'))}
+          ${featPill('🔗', t('feat_label_marketplaces'), f.marketplaces, t('feat_marketplaces'))}
         </div>
       </div>
 
       <div class="score-grid">
-        <div class="score-item"><div class="name">Fiyat</div><div class="num">${p.scores.fiyat}</div></div>
-        <div class="score-item"><div class="name">Özellik</div><div class="num">${p.scores.ozellik}</div></div>
-        <div class="score-item"><div class="name">Kolay</div><div class="num">${p.scores.kolaylik}</div></div>
-        <div class="score-item"><div class="name">Destek</div><div class="num">${p.scores.destek}</div></div>
-        <div class="score-item"><div class="name">Ekosistem</div><div class="num">${p.scores.ekosistem}</div></div>
+        <div class="score-item"><div class="name">${t('score_price')}</div><div class="num">${p.scores.fiyat}</div></div>
+        <div class="score-item"><div class="name">${t('score_feat')}</div><div class="num">${p.scores.ozellik}</div></div>
+        <div class="score-item"><div class="name">${t('score_easy')}</div><div class="num">${p.scores.kolaylik}</div></div>
+        <div class="score-item"><div class="name">${t('score_support')}</div><div class="num">${p.scores.destek}</div></div>
+        <div class="score-item"><div class="name">${t('score_eco')}</div><div class="num">${p.scores.ekosistem}</div></div>
       </div>
 
       <div class="pros-cons-row">
         <div class="pros-cons-col pros">
-          <strong>+ Artılar</strong>
-          <ul class="feat-list pros">${p.pros.slice(0, 5).map(x => `<li>${x}</li>`).join('')}</ul>
+          <strong>${t('card_pros')}</strong>
+          <ul class="feat-list pros">${p.pros.slice(0, 5).map(x => `<li>${tt(x)}</li>`).join('')}</ul>
         </div>
         <div class="pros-cons-col cons">
-          <strong>− Eksiler</strong>
-          <ul class="feat-list cons">${p.cons.slice(0, 4).map(x => `<li>${x}</li>`).join('')}</ul>
+          <strong>${t('card_cons')}</strong>
+          <ul class="feat-list cons">${p.cons.slice(0, 4).map(x => `<li>${tt(x)}</li>`).join('')}</ul>
         </div>
       </div>
 
       <div class="best-for">
-        <strong>En uygun</strong>
-        <div>${p.bestFor}</div>
+        <strong>${t('card_bestfor')}</strong>
+        <div>${tt(p.bestFor)}</div>
       </div>
     </div>
     ${linkClose}
@@ -973,33 +1363,33 @@ function renderTable() {
   const list = filterPlatforms();
   const head = document.getElementById('tableHead');
   const tbody = document.querySelector('#comparisonTable tbody');
-  document.getElementById('tableCount').textContent = `${list.length} platform`;
+  document.getElementById('tableCount').textContent = `${list.length} ${t('count_total')}`;
 
-  head.innerHTML = '<th>Kriter</th>' + list.map(p => `<th>${p.region === 'TR' ? '🇹🇷 ' : '🌍 '}${p.name}</th>`).join('');
+  head.innerHTML = `<th>${t('tbl_kriter')}</th>` + list.map(p => `<th>${p.region === 'TR' ? '🇹🇷 ' : '🌍 '}${p.name}</th>`).join('');
 
   const rows = [
-    { k: 'Başlangıç', f: p => p.pricing.starter },
-    { k: 'Üst paket', f: p => p.pricing.enterprise },
-    { k: 'Deneme', f: p => p.trial },
-    { k: 'Kuruluş', f: p => p.foundedYear },
-    { k: 'Müşteri', f: p => p.customers },
-    { k: 'Model', f: p => p.model },
-    { k: 'Bölge', f: p => p.region === 'TR' ? '🇹🇷 Türkiye' : `${p.country} Global` },
-    { k: 'Tema sayısı', f: p => featFmt(p.features?.themes) },
-    { k: 'Mobil app', f: p => boolFmt(p.features?.mobile) },
-    { k: 'AI', f: p => boolFmt(p.features?.ai) },
-    { k: 'B2B', f: p => boolFmt(p.features?.b2b) },
-    { k: 'Çok dil', f: p => boolFmt(p.features?.multilang) },
-    { k: 'POS', f: p => boolFmt(p.features?.pos) },
-    { k: 'Ödeme yöntemi', f: p => featFmt(p.features?.payments) },
-    { k: 'Pazaryeri', f: p => featFmt(p.features?.marketplaces) },
-    { k: 'Veri Şeffaflığı', f: p => { const t = TRANSPARENCY[p.id]; if (t === undefined) return '–'; const cls = t >= 8 ? 'check' : (t >= 5 ? 'partial' : 'cross'); return `<span class="${cls}">${t}/10</span>`; } },
-    { k: 'Toplam Skor', f: p => `${p.total}/10` },
-    { k: 'Fiyat', f: p => `${p.scores.fiyat}/10` },
-    { k: 'Özellik', f: p => `${p.scores.ozellik}/10` },
-    { k: 'Kolaylık', f: p => `${p.scores.kolaylik}/10` },
-    { k: 'Destek', f: p => `${p.scores.destek}/10` },
-    { k: 'Ekosistem', f: p => `${p.scores.ekosistem}/10` }
+    { k: t('tbl_start'), f: p => tt(p.pricing.starter) },
+    { k: t('tbl_top'), f: p => tt(p.pricing.enterprise) },
+    { k: t('tbl_trial'), f: p => tt(p.trial) },
+    { k: t('tbl_founded'), f: p => p.foundedYear || tt('Belirsiz') },
+    { k: t('tbl_customers'), f: p => tt(p.customers) },
+    { k: t('tbl_model'), f: p => p.model },
+    { k: t('tbl_region'), f: p => p.region === 'TR' ? t('tr_label') : `${p.country} ${t('global_label')}` },
+    { k: t('tbl_themes'), f: p => featFmt(p.features?.themes) },
+    { k: t('tbl_mobile'), f: p => boolFmt(p.features?.mobile) },
+    { k: t('tbl_ai'), f: p => boolFmt(p.features?.ai) },
+    { k: t('tbl_b2b'), f: p => boolFmt(p.features?.b2b) },
+    { k: t('tbl_multilang'), f: p => boolFmt(p.features?.multilang) },
+    { k: t('tbl_pos'), f: p => boolFmt(p.features?.pos) },
+    { k: t('tbl_payments'), f: p => featFmt(p.features?.payments) },
+    { k: t('tbl_marketplaces'), f: p => featFmt(p.features?.marketplaces) },
+    { k: t('tbl_transparency'), f: p => { const tr = TRANSPARENCY[p.id]; if (tr === undefined) return '–'; const cls = tr >= 8 ? 'check' : (tr >= 5 ? 'partial' : 'cross'); return `<span class="${cls}">${tr}/10</span>`; } },
+    { k: t('tbl_total'), f: p => `${p.total}/10` },
+    { k: t('tbl_price_score'), f: p => `${p.scores.fiyat}/10` },
+    { k: t('tbl_feat_score'), f: p => `${p.scores.ozellik}/10` },
+    { k: t('tbl_easy_score'), f: p => `${p.scores.kolaylik}/10` },
+    { k: t('tbl_support_score'), f: p => `${p.scores.destek}/10` },
+    { k: t('tbl_eco_score'), f: p => `${p.scores.ekosistem}/10` }
   ];
 
   tbody.innerHTML = rows.map(r => `
@@ -1011,10 +1401,10 @@ function renderTable() {
 }
 
 function boolFmt(v) {
-  if (v === 1) return '<span class="check">✓ Var</span>';
-  if (v === 0.5) return '<span class="partial">◐ Kısmen</span>';
-  if (v === 0) return '<span class="cross">✗ Yok</span>';
-  return '<span style="color:var(--text-mute)">? Belirsiz</span>';
+  if (v === 1) return `<span class="check">✓ ${t('val_var')}</span>`;
+  if (v === 0.5) return `<span class="partial">◐ ${t('val_partial')}</span>`;
+  if (v === 0) return `<span class="cross">✗ ${t('val_yok')}</span>`;
+  return `<span style="color:var(--text-mute)">? ${t('val_unknown')}</span>`;
 }
 function featFmt(v) {
   if (typeof v !== 'number') return '<span style="color:var(--text-mute)">?</span>';
@@ -1061,11 +1451,13 @@ function updateCounts() {
 function populateCompareSelects() {
   const selA = document.getElementById('compareA');
   const selB = document.getElementById('compareB');
+  const prevA = selA.value || 'hemenmagaza';
+  const prevB = selB.value || 'ikas';
   const options = PLATFORMS.map(p => `<option value="${p.id}">${p.country} ${p.name} (${p.total}/10)</option>`).join('');
   selA.innerHTML = options;
   selB.innerHTML = options;
-  selA.value = 'hemenmagaza';
-  selB.value = 'ikas';
+  selA.value = prevA;
+  selB.value = prevB;
   renderCompareResult();
 }
 
@@ -1076,7 +1468,7 @@ function renderCompareResult() {
 
   const out = document.getElementById('compareResult');
   if (a.id === b.id) {
-    out.innerHTML = '<div style="text-align:center; color:var(--text-mute); padding:24px">Aynı platformu seçtin — farklı 2 platform seçerek kıyasla.</div>';
+    out.innerHTML = `<div style="text-align:center; color:var(--text-mute); padding:24px">${t('compare_same')}</div>`;
     return;
   }
 
@@ -1084,35 +1476,35 @@ function renderCompareResult() {
   const totalWinner = a.total > b.total ? 'a' : (a.total < b.total ? 'b' : 'tie');
 
   const fields = [
-    { key: 'Başlangıç fiyatı', a: a.pricing.starter, b: b.pricing.starter, winner: pickPriceLower(a.pricing.starter, b.pricing.starter) },
-    { key: 'Büyüme paketi', a: a.pricing.growth, b: b.pricing.growth, winner: 'tie' },
-    { key: 'Üst paket', a: a.pricing.enterprise, b: b.pricing.enterprise, winner: 'tie' },
-    { key: 'Ücretsiz deneme', a: a.trial, b: b.trial, winner: a.trial.includes('30') ? 'a' : (b.trial.includes('30') ? 'b' : 'tie') },
-    { key: 'Kuruluş yılı', a: a.foundedYear, b: b.foundedYear, winner: cmp(a.foundedYear, b.foundedYear) },
-    { key: 'Müşteri tabanı', a: a.customers, b: b.customers, winner: 'tie' },
-    { key: 'Bölge', a: a.region === 'TR' ? '🇹🇷 Türkiye' : `${a.country} Global`, b: b.region === 'TR' ? '🇹🇷 Türkiye' : `${b.country} Global`, winner: 'tie' },
-    { key: 'Model', a: a.model, b: b.model, winner: 'tie' }
+    { key: t('compare_row_start'), a: tt(a.pricing.starter), b: tt(b.pricing.starter), winner: pickPriceLower(a.pricing.starter, b.pricing.starter) },
+    { key: t('compare_row_growth'), a: tt(a.pricing.growth), b: tt(b.pricing.growth), winner: 'tie' },
+    { key: t('compare_row_enterprise'), a: tt(a.pricing.enterprise), b: tt(b.pricing.enterprise), winner: 'tie' },
+    { key: t('compare_row_trial'), a: tt(a.trial), b: tt(b.trial), winner: (a.trial && a.trial.includes('30')) ? 'a' : ((b.trial && b.trial.includes('30')) ? 'b' : 'tie') },
+    { key: t('compare_row_founded'), a: a.foundedYear || tt('Belirsiz'), b: b.foundedYear || tt('Belirsiz'), winner: cmp(a.foundedYear, b.foundedYear) },
+    { key: t('compare_row_customers'), a: tt(a.customers), b: tt(b.customers), winner: 'tie' },
+    { key: t('compare_row_region'), a: a.region === 'TR' ? t('tr_label') : `${a.country} ${t('global_label')}`, b: b.region === 'TR' ? t('tr_label') : `${b.country} ${t('global_label')}`, winner: 'tie' },
+    { key: t('compare_row_model'), a: a.model, b: b.model, winner: 'tie' }
   ];
 
   const featRows = [
-    { key: '🎨 Tema sayısı', a: featFmt(fA.themes), b: featFmt(fB.themes), winner: cmp(fA.themes || 0, fB.themes || 0) },
-    { key: '📱 Mobil app', a: boolFmt(fA.mobile), b: boolFmt(fB.mobile), winner: cmp(fA.mobile || 0, fB.mobile || 0) },
-    { key: '🤖 AI özellikler', a: boolFmt(fA.ai), b: boolFmt(fB.ai), winner: cmp(fA.ai || 0, fB.ai || 0) },
-    { key: '🏪 B2B', a: boolFmt(fA.b2b), b: boolFmt(fB.b2b), winner: cmp(fA.b2b || 0, fB.b2b || 0) },
-    { key: '🌐 Çok dil', a: boolFmt(fA.multilang), b: boolFmt(fB.multilang), winner: cmp(fA.multilang || 0, fB.multilang || 0) },
-    { key: '🛒 POS', a: boolFmt(fA.pos), b: boolFmt(fB.pos), winner: cmp(fA.pos || 0, fB.pos || 0) },
-    { key: '💳 Ödeme yöntemi', a: featFmt(fA.payments), b: featFmt(fB.payments), winner: cmp(fA.payments || 0, fB.payments || 0) },
-    { key: '🔗 Pazaryeri', a: featFmt(fA.marketplaces), b: featFmt(fB.marketplaces), winner: cmp(fA.marketplaces || 0, fB.marketplaces || 0) }
+    { key: t('compare_feat_themes'), a: featFmt(fA.themes), b: featFmt(fB.themes), winner: cmp(fA.themes || 0, fB.themes || 0) },
+    { key: t('compare_feat_mobile'), a: boolFmt(fA.mobile), b: boolFmt(fB.mobile), winner: cmp(fA.mobile || 0, fB.mobile || 0) },
+    { key: t('compare_feat_ai'), a: boolFmt(fA.ai), b: boolFmt(fB.ai), winner: cmp(fA.ai || 0, fB.ai || 0) },
+    { key: t('compare_feat_b2b'), a: boolFmt(fA.b2b), b: boolFmt(fB.b2b), winner: cmp(fA.b2b || 0, fB.b2b || 0) },
+    { key: t('compare_feat_multilang'), a: boolFmt(fA.multilang), b: boolFmt(fB.multilang), winner: cmp(fA.multilang || 0, fB.multilang || 0) },
+    { key: t('compare_feat_pos'), a: boolFmt(fA.pos), b: boolFmt(fB.pos), winner: cmp(fA.pos || 0, fB.pos || 0) },
+    { key: t('compare_feat_payments'), a: featFmt(fA.payments), b: featFmt(fB.payments), winner: cmp(fA.payments || 0, fB.payments || 0) },
+    { key: t('compare_feat_marketplaces'), a: featFmt(fA.marketplaces), b: featFmt(fB.marketplaces), winner: cmp(fA.marketplaces || 0, fB.marketplaces || 0) }
   ];
 
   const tA = TRANSPARENCY[a.id], tB = TRANSPARENCY[b.id];
   const scoreRows = [
-    { key: 'Veri Şeffaflığı', a: tA !== undefined ? `${tA}/10` : '?', b: tB !== undefined ? `${tB}/10` : '?', winner: cmp(tA || 0, tB || 0) },
-    { key: 'Fiyat skoru', a: `${a.scores.fiyat}/10`, b: `${b.scores.fiyat}/10`, winner: cmp(a.scores.fiyat, b.scores.fiyat) },
-    { key: 'Özellik skoru', a: `${a.scores.ozellik}/10`, b: `${b.scores.ozellik}/10`, winner: cmp(a.scores.ozellik, b.scores.ozellik) },
-    { key: 'Kolaylık', a: `${a.scores.kolaylik}/10`, b: `${b.scores.kolaylik}/10`, winner: cmp(a.scores.kolaylik, b.scores.kolaylik) },
-    { key: 'Destek', a: `${a.scores.destek}/10`, b: `${b.scores.destek}/10`, winner: cmp(a.scores.destek, b.scores.destek) },
-    { key: 'Ekosistem', a: `${a.scores.ekosistem}/10`, b: `${b.scores.ekosistem}/10`, winner: cmp(a.scores.ekosistem, b.scores.ekosistem) }
+    { key: t('compare_score_trans'), a: tA !== undefined ? `${tA}/10` : '?', b: tB !== undefined ? `${tB}/10` : '?', winner: cmp(tA || 0, tB || 0) },
+    { key: t('compare_score_price'), a: `${a.scores.fiyat}/10`, b: `${b.scores.fiyat}/10`, winner: cmp(a.scores.fiyat, b.scores.fiyat) },
+    { key: t('compare_score_feat'), a: `${a.scores.ozellik}/10`, b: `${b.scores.ozellik}/10`, winner: cmp(a.scores.ozellik, b.scores.ozellik) },
+    { key: t('compare_score_easy'), a: `${a.scores.kolaylik}/10`, b: `${b.scores.kolaylik}/10`, winner: cmp(a.scores.kolaylik, b.scores.kolaylik) },
+    { key: t('compare_score_support'), a: `${a.scores.destek}/10`, b: `${b.scores.destek}/10`, winner: cmp(a.scores.destek, b.scores.destek) },
+    { key: t('compare_score_eco'), a: `${a.scores.ekosistem}/10`, b: `${b.scores.ekosistem}/10`, winner: cmp(a.scores.ekosistem, b.scores.ekosistem) }
   ];
 
   const renderRow = r => `
@@ -1128,23 +1520,29 @@ function renderCompareResult() {
         <div class="card-logo ${p.logoCls}" style="width:36px;height:36px;font-size:15px">${p.logoTxt}</div>
         <div style="flex:1; min-width:0">
           <h4>${p.name}</h4>
-          <div class="meta-line">${p.sub}</div>
+          <div class="meta-line">${tt(p.sub)}</div>
         </div>
       </div>
       <div style="text-align:center">
         <div class="total">${p.total}/10</div>
-        <div class="total-lbl">Toplam skor</div>
+        <div class="total-lbl">${t('compare_total_lbl')}</div>
       </div>
-      <div class="meta-line" style="text-align:center; margin-top:8px">${p.country} · ${p.model} · ${p.customers} müşteri</div>
+      <div class="meta-line" style="text-align:center; margin-top:8px">${p.country} · ${p.model} · ${tt(p.customers)}</div>
       ${URL_MAP[p.id] ? `<div style="text-align:center; margin-top:8px"><a href="${URL_MAP[p.id]}" target="_blank" rel="noopener" style="font-size:11px; color:var(--accent-2); text-decoration:none; font-weight:600">${URL_MAP[p.id].replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')} ↗</a></div>` : ''}
     </div>`;
 
   let verdictText = '';
-  if (totalWinner === 'a') verdictText = `<strong>${a.name}</strong> toplam skorda öne çıkıyor (${a.total} vs ${b.total}).`;
-  else if (totalWinner === 'b') verdictText = `<strong>${b.name}</strong> toplam skorda öne çıkıyor (${b.total} vs ${a.total}).`;
-  else verdictText = `İki platform da eşit toplam skorda (${a.total}/10). Önceliklerine göre karar ver.`;
-  verdictText += ` ${a.region === b.region ? '' : a.region === 'TR' ? `${a.name} Türkiye odaklı, ${b.name} global. ` : `${b.name} Türkiye odaklı, ${a.name} global. `}`;
-  verdictText += `Bütçen sıkıysa <strong>${a.scores.fiyat > b.scores.fiyat ? a.name : b.name}</strong>, özellik istiyorsan <strong>${a.scores.ozellik > b.scores.ozellik ? a.name : b.name}</strong> tercih edilebilir.`;
+  if (totalWinner === 'a') verdictText = `<strong>${a.name}</strong>${t('compare_v_a_leads')} (${a.total} vs ${b.total}).`;
+  else if (totalWinner === 'b') verdictText = `<strong>${b.name}</strong>${t('compare_v_b_leads')} (${b.total} vs ${a.total}).`;
+  else verdictText = `${t('compare_v_tie')} (${a.total}/10). ${t('compare_v_priorities')}`;
+  if (a.region !== b.region) {
+    const trBrand = a.region === 'TR' ? a.name : b.name;
+    const globalBrand = a.region === 'TR' ? b.name : a.name;
+    verdictText += ` <strong>${trBrand}</strong>${t('compare_v_tr_focus')} <strong>${globalBrand}</strong> ${t('compare_v_global_focus')}`;
+  }
+  const cheap = a.scores.fiyat > b.scores.fiyat ? a.name : b.name;
+  const rich = a.scores.ozellik > b.scores.ozellik ? a.name : b.name;
+  verdictText += ` ${t('compare_v_budget_left')} <strong>${cheap}</strong>${t('compare_v_budget_right')} <strong>${rich}</strong> ${t('compare_v_budget_end')}`;
 
   out.innerHTML = `
     <div class="compare-header">
@@ -1152,36 +1550,36 @@ function renderCompareResult() {
       ${renderSide(b, totalWinner === 'b')}
     </div>
 
-    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">Fiyat & Genel Bilgiler</h4>
+    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">${t('compare_h_pricing')}</h4>
     ${fields.map(renderRow).join('')}
 
-    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">Özellikler</h4>
+    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">${t('compare_h_features')}</h4>
     ${featRows.map(renderRow).join('')}
 
-    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">Skorlar</h4>
+    <h4 style="font-size:13px; color:var(--text); margin:14px 0 6px">${t('compare_h_scores')}</h4>
     ${scoreRows.map(renderRow).join('')}
 
     <div class="compare-prosCons">
       <div class="compare-prosCons-col">
-        <h5 style="color:var(--good)">+ ${a.name} artıları</h5>
-        <ul class="feat-list pros">${a.pros.slice(0, 6).map(x => `<li>${x}</li>`).join('')}</ul>
+        <h5 style="color:var(--good)">${t('compare_pros_a_prefix')}${a.name}${t('compare_pros_a_suffix')}</h5>
+        <ul class="feat-list pros">${a.pros.slice(0, 6).map(x => `<li>${tt(x)}</li>`).join('')}</ul>
       </div>
       <div class="compare-prosCons-col">
-        <h5 style="color:var(--good)">+ ${b.name} artıları</h5>
-        <ul class="feat-list pros">${b.pros.slice(0, 6).map(x => `<li>${x}</li>`).join('')}</ul>
+        <h5 style="color:var(--good)">${t('compare_pros_a_prefix')}${b.name}${t('compare_pros_a_suffix')}</h5>
+        <ul class="feat-list pros">${b.pros.slice(0, 6).map(x => `<li>${tt(x)}</li>`).join('')}</ul>
       </div>
       <div class="compare-prosCons-col">
-        <h5 style="color:var(--bad)">− ${a.name} eksileri</h5>
-        <ul class="feat-list cons">${a.cons.slice(0, 5).map(x => `<li>${x}</li>`).join('')}</ul>
+        <h5 style="color:var(--bad)">${t('compare_cons_a_prefix')}${a.name}${t('compare_cons_a_suffix')}</h5>
+        <ul class="feat-list cons">${a.cons.slice(0, 5).map(x => `<li>${tt(x)}</li>`).join('')}</ul>
       </div>
       <div class="compare-prosCons-col">
-        <h5 style="color:var(--bad)">− ${b.name} eksileri</h5>
-        <ul class="feat-list cons">${b.cons.slice(0, 5).map(x => `<li>${x}</li>`).join('')}</ul>
+        <h5 style="color:var(--bad)">${t('compare_cons_a_prefix')}${b.name}${t('compare_cons_a_suffix')}</h5>
+        <ul class="feat-list cons">${b.cons.slice(0, 5).map(x => `<li>${tt(x)}</li>`).join('')}</ul>
       </div>
     </div>
 
     <div class="compare-verdict">
-      <strong>🎯 Karar:</strong> ${verdictText}
+      <strong>${t('compare_verdict_label')}</strong> ${verdictText}
     </div>
   `;
 }
@@ -1199,7 +1597,7 @@ document.querySelectorAll('.quiz-opt').forEach(opt => {
 
 document.getElementById('quizGo').addEventListener('click', () => {
   if (Object.values(QUIZ).some(v => v === null)) {
-    alert('Lütfen tüm soruları yanıtlayın.');
+    alert(t('quiz_alert'));
     return;
   }
   showQuizResult(computeQuizScores());
@@ -1248,15 +1646,15 @@ function showQuizResult(scores) {
   const top = ranked[0];
   const out = document.getElementById('quizResult');
   out.innerHTML = `
-    <h4>🎯 Sana en uygun: <span style="color:var(--accent-2);">${top.p.name}</span></h4>
-    <p style="color:var(--text-dim); font-size:13px; margin-bottom:8px">Cevaplarına göre: <strong>${top.p.bestFor.toLowerCase()}</strong></p>
+    <h4>${t('quiz_top_label')} <span style="color:var(--accent-2);">${top.p.name}</span></h4>
+    <p style="color:var(--text-dim); font-size:13px; margin-bottom:8px">${t('quiz_acc')} <strong>${tt(top.p.bestFor).toLowerCase()}</strong></p>
     ${ranked.map(r => `
       <div class="rec">
-        <div class="pct">%${r.pct}</div>
+        <div class="pct">${LANG === 'tr' ? '%' + r.pct : r.pct + '%'}</div>
         <div class="card-logo ${r.p.logoCls}" style="width:28px;height:28px;font-size:11px">${r.p.logoTxt}</div>
         <div style="flex:1">
           <div style="font-weight:700; font-size:13px">${r.p.name} <span style="font-size:9px; color:var(--text-mute); margin-left:4px">${r.p.country} · ${r.p.model}</span></div>
-          <div style="font-size:11px; color: var(--text-mute)">${r.p.sub}</div>
+          <div style="font-size:11px; color: var(--text-mute)">${tt(r.p.sub)}</div>
         </div>
         <div style="font-size:12px; font-weight:700; color: var(--accent-2)">${r.p.total}/10</div>
       </div>
@@ -1309,7 +1707,141 @@ document.getElementById('sortSelect').addEventListener('change', e => {
   renderTable();
 });
 
-document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.title = t('title');
+
+  // Update banner (preserve date)
+  const banner = document.getElementById('updateBanner');
+  const dateLocale = LANG === 'en' ? 'en-US' : 'tr-TR';
+  const today = new Date().toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' });
+  banner.innerHTML = `${t('updateBanner_prefix')} <span id="lastUpdate">${today}</span> ${t('updateBanner_suffix')}`;
+
+  // Logo: span.dot + text node
+  const logoEl = document.querySelector('.logo');
+  const dotHTML = logoEl.querySelector('.dot').outerHTML;
+  logoEl.innerHTML = dotHTML + ' ' + t('logo');
+
+  // Buttons
+  document.getElementById('themeBtn').title = t('themeBtn_title');
+  document.getElementById('quizBtn').textContent = t('quizBtn');
+
+  // Hero
+  document.querySelector('.hero-badge').textContent = t('hero_badge');
+  document.querySelector('.hero h1').innerHTML = `<span class="grad">${t('hero_h1_grad')}</span> ${t('hero_h1_after')}`;
+  document.querySelector('.hero p').textContent = t('hero_p');
+
+  // Stats
+  const statLbls = document.querySelectorAll('.stat .lbl');
+  if (statLbls[0]) statLbls[0].textContent = t('stat_platform');
+  if (statLbls[1]) statLbls[1].textContent = t('stat_tr');
+  if (statLbls[2]) statLbls[2].textContent = t('stat_global');
+  if (statLbls[3]) statLbls[3].textContent = t('stat_features');
+  if (statLbls[4]) statLbls[4].textContent = t('stat_lowest');
+
+  // Tabs
+  const setTab = (sel, key) => { const el = document.querySelector(sel); if (el) el.textContent = t(key); };
+  setTab('[data-tab="cards"]', 'tab_cards');
+  setTab('[data-tab="table"]', 'tab_table');
+  setTab('[data-tab="compare"]', 'tab_compare');
+  setTab('[data-tab="quiz"]', 'tab_quiz');
+
+  // Search placeholder
+  document.getElementById('searchInput').placeholder = t('search_placeholder');
+
+  // Helper: update chip preserving count span
+  function chipText(chip, label) {
+    const count = chip.querySelector('.count');
+    chip.innerHTML = label + (count ? ' ' + count.outerHTML : '');
+  }
+  // Region chips
+  const rc = document.querySelectorAll('#regionChips .chip');
+  if (rc[0]) chipText(rc[0], t('chip_all'));
+  if (rc[1]) chipText(rc[1], t('chip_tr'));
+  if (rc[2]) chipText(rc[2], t('chip_global'));
+  // Model chips
+  const mc = document.querySelectorAll('#modelChips .chip');
+  if (mc[0]) chipText(mc[0], t('chip_brands'));
+  if (mc[1]) chipText(mc[1], t('chip_total'));
+  if (mc[2]) chipText(mc[2], t('chip_saas'));
+  if (mc[3]) chipText(mc[3], t('chip_oss'));
+  if (mc[4]) chipText(mc[4], t('chip_enterprise'));
+
+  // Sort select
+  const sortOpts = document.querySelectorAll('#sortSelect option');
+  if (sortOpts[0]) sortOpts[0].textContent = t('sort_score');
+  if (sortOpts[1]) sortOpts[1].textContent = t('sort_name');
+  if (sortOpts[2]) sortOpts[2].textContent = t('sort_pop');
+  if (sortOpts[3]) sortOpts[3].textContent = t('sort_founded');
+
+  // Section heads
+  const setSect = (id, h, p) => {
+    const sec = document.getElementById(id);
+    if (!sec) return;
+    const h2 = sec.querySelector('.section-head h2');
+    const pp = sec.querySelector('.section-head p');
+    if (h2) h2.textContent = t(h);
+    if (pp) pp.textContent = t(p);
+  };
+  setSect('cards', 'cards_h2', 'cards_p');
+  setSect('table', 'table_h2', 'table_p');
+  setSect('compare', 'compare_h2', 'compare_p');
+  setSect('quiz', 'quiz_h2', 'quiz_p');
+
+  document.getElementById('emptyState').textContent = t('empty_msg');
+  document.getElementById('compareSwap').title = t('compare_swap_title');
+
+  // Quiz questions
+  const qq = document.querySelectorAll('.quiz-q h4');
+  ['quiz_q1','quiz_q2','quiz_q3','quiz_q4','quiz_q5'].forEach((k,i) => { if (qq[i]) qq[i].textContent = t(k); });
+
+  const setOpts = (q, keys) => {
+    const opts = document.querySelectorAll(`.quiz-q[data-q="${q}"] .quiz-opt`);
+    keys.forEach((k,i) => { if (opts[i]) opts[i].textContent = t(k); });
+  };
+  setOpts('budget', ['quiz_q1_free','quiz_q1_low','quiz_q1_mid','quiz_q1_high','quiz_q1_xhigh']);
+  setOpts('market', ['quiz_q2_tr','quiz_q2_export','quiz_q2_global']);
+  setOpts('experience', ['quiz_q3_new','quiz_q3_some','quiz_q3_pro','quiz_q3_ent']);
+  setOpts('tech', ['quiz_q4_none','quiz_q4_basic','quiz_q4_dev']);
+  setOpts('priority', ['quiz_q5_simple','quiz_q5_custom','quiz_q5_ecosystem','quiz_q5_design','quiz_q5_scale']);
+
+  document.getElementById('quizGo').textContent = t('quiz_show');
+
+  // Footer
+  const fps = document.querySelectorAll('footer p');
+  if (fps[0]) fps[0].innerHTML = t('footer_p1');
+  if (fps[1]) fps[1].textContent = t('footer_p2');
+  if (fps[2]) fps[2].innerHTML = `${t('footer_p3')} <a href="https://github.com/baranbaranpolat-dotcom/eticaret-platformlari" target="_blank">${t('footer_github')}</a>`;
+
+  // Skip link
+  const skip = document.querySelector('.skip-link');
+  if (skip) skip.textContent = t('skip_link');
+
+  // Lang button active state
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+
+  localStorage.setItem('eticaret-lang', LANG);
+
+  // Re-render dynamic
+  populateCompareSelects();
+  updateCounts();
+  renderCards();
+  renderTable();
+
+  // Re-render quiz result if open
+  const qr = document.getElementById('quizResult');
+  if (qr && qr.classList.contains('show') && Object.values(QUIZ).every(v => v !== null)) {
+    showQuizResult(computeQuizScores());
+  }
+}
+
+// Language toggle listeners
+document.querySelectorAll('.lang-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    LANG = btn.dataset.lang;
+    applyLang();
+  });
+});
 
 document.getElementById('compareA').addEventListener('change', renderCompareResult);
 document.getElementById('compareB').addEventListener('change', renderCompareResult);
@@ -1322,10 +1854,7 @@ document.getElementById('compareSwap').addEventListener('click', () => {
   renderCompareResult();
 });
 
-updateCounts();
-populateCompareSelects();
-renderCards();
-renderTable();
+applyLang();
 </script>
 </body>
 </html>
