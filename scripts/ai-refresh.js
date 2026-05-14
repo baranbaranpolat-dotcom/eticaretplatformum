@@ -119,12 +119,20 @@ function replaceTopLevelField(html, platformId, field, newValue) {
   return html.replace(re, `$1'${clean}'`);
 }
 
+// Platforms / fields where AI-extracted values must NEVER be written back.
+// Reason: site uses a dynamic placeholder (e.g. "{{stores_count+200}}+") that the AI
+// keeps interpreting as a real number, producing false counts like "239+ Aktif mağaza".
+const SKIP_FIELDS = {
+  hemenmagaza: new Set(['customer_count'])
+};
+
 function updatePlatformInHtml(html, platformId, data) {
-  if (data.starter_price) html = replaceFieldOnce(html, platformId, 'pricing', 'starter', data.starter_price);
-  if (data.growth_price) html = replaceFieldOnce(html, platformId, 'pricing', 'growth', data.growth_price);
-  if (data.enterprise_price) html = replaceFieldOnce(html, platformId, 'pricing', 'enterprise', data.enterprise_price);
-  if (data.trial) html = replaceTopLevelField(html, platformId, 'trial', data.trial);
-  if (data.customer_count) html = replaceTopLevelField(html, platformId, 'customers', data.customer_count);
+  const skip = SKIP_FIELDS[platformId] || new Set();
+  if (data.starter_price && !skip.has('starter_price')) html = replaceFieldOnce(html, platformId, 'pricing', 'starter', data.starter_price);
+  if (data.growth_price && !skip.has('growth_price')) html = replaceFieldOnce(html, platformId, 'pricing', 'growth', data.growth_price);
+  if (data.enterprise_price && !skip.has('enterprise_price')) html = replaceFieldOnce(html, platformId, 'pricing', 'enterprise', data.enterprise_price);
+  if (data.trial && !skip.has('trial')) html = replaceTopLevelField(html, platformId, 'trial', data.trial);
+  if (data.customer_count && !skip.has('customer_count')) html = replaceTopLevelField(html, platformId, 'customers', data.customer_count);
   return html;
 }
 
