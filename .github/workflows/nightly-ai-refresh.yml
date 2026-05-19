@@ -1,9 +1,11 @@
-name: Nightly AI-powered data refresh
+name: Manual AI-powered data refresh
 
+# Otomatik schedule devre dışı (kullanıcı isteği — 2026-05-14).
+# Sadece "Run workflow" butonu veya gh workflow run ile manuel tetiklenir.
+# Yeniden aktive etmek için aşağıdaki schedule bloğunun yorumunu kaldır.
 on:
-  schedule:
-    # Her gece 21:00 UTC = 00:00 Türkiye saati
-    - cron: '0 21 * * *'
+  # schedule:
+  #   - cron: '0 21 * * *'  # Her gece 21:00 UTC = 00:00 Türkiye saati
   workflow_dispatch:
 
 permissions:
